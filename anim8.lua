@@ -4,6 +4,11 @@
 -- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+local function assertPositiveInteger(value, name)
+  if type(value) ~= 'number' then error(("%s should be a number, was %q"):format(name, tostring(value))) end
+  if value < 1 then error(("%s should be a positive number, was %d"):format(name, value)) end
+  if value ~= math.floor(value) then error(("%s should be an integer, was %d"):format(name, value)) end
+end
 
 local Grid = {}
 
@@ -27,6 +32,25 @@ local function getOrCreateFrame(self, x, y)
   return self._frames[x][y]
 end
 
+local function parseInterval(str)
+  str = str:gsub(' ', '')
+  local min, max = str:match("^(%d+)-(%d+)$")
+  if not min then
+    min = str:match("^%d+$")
+    max = min
+  end
+  assert(min and max, ("Could not parse interval from %q"):format(str))
+  return tonumber(min), tonumber(max)
+end
+
+local function parseIntervals(str)
+  local left, right = str:match("(.+),(.+)")
+  assert(left and right, ("Could not parse intervals from %q"):format(str))
+  local minx, maxx = parseInterval(left)
+  local miny, maxy = parseInterval(right)
+  return minx, miny, maxx, maxy
+end
+
 local function parseFrames(self, args, result, position)
   local current = args[position]
   local kind = type(current)
@@ -41,7 +65,7 @@ local function parseFrames(self, args, result, position)
     local minx, miny, maxx, maxy = parseIntervals(current)
     for x = minx, maxx do
       for y = miny, maxy do
-        result[#result+1] = getFrame(self,x,y)
+        result[#result+1] = getOrCreateFrame(self,x,y)
       end
     end
 
@@ -72,12 +96,6 @@ local Gridmt = {
   __call  = Grid.getFrames
 }
 
-local function assertPositiveInteger(value, name)
-  if type(value) ~= 'number' then error(("%s should be a number, was %q"):format(name, tostring(value))) end
-  if value < 1 then error(("%s should be a positive number, was %d"):format(name, value)) end
-  if value ~= math.floor(value) then error(("%s should be an integer, was %d"):format(name, value)) end
-end
-
 local function newGrid(frameWidth, frameHeight, imageWidth, imageHeight)
   assertPositiveInteger(frameWidth,  "frameWidth")
   assertPositiveInteger(frameHeight, "frameHeight")
@@ -97,6 +115,12 @@ local function newGrid(frameWidth, frameHeight, imageWidth, imageHeight)
   )
   return grid
 end
+
+-----------------------------------------------------------
+
+local Animation = {}
+
+-----------------------------------------------------------
 
 local anim8 = {
   newGrid = newGrid
