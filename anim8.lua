@@ -126,17 +126,6 @@ local function cloneArray(arr)
   return result
 end
 
-local animationModes = {
-  loop   = function(self) self.position = 1 end,
-  once   = function(self) self.position = #self.frames end,
-  bounce = function(self)
-    self.direction = self.direction * -1
-    self.position = self.position + self.direction + self.direction
-  end
-}
-
-local Animationmt = { __index = Animation }
-
 local function parseDelays(delays)
   local parsedDelays = {}
   local tk,min,max
@@ -172,6 +161,17 @@ local function createDelays(frames, defaultDelay, delays)
   return result
 end
 
+local animationModes = {
+  loop   = function(self) self.position = 1 end,
+  once   = function(self) self.position = #self.frames end,
+  bounce = function(self)
+    self.direction = self.direction * -1
+    self.position = self.position + self.direction + self.direction
+  end
+}
+
+local Animationmt = { __index = Animation }
+
 local function newAnimation(mode, frames, defaultDelay, delays)
   delays = delays or {}
   assert(animationModes[mode], ("%q is not a valid mode"):format(tostring(mode)))
@@ -191,7 +191,27 @@ local function newAnimation(mode, frames, defaultDelay, delays)
   )
 end
 
+function Animation:update(dt)
+  if self.status ~= "playing" then return end
 
+  self.timer = self.timer + dt
+
+  while self.timer > self.delays[self.position] do
+    self.timer = self.timer - self.delays[self.position]
+    self.position = self.position + self.direction
+    if self.position < 1 or self.position > #self.frames then
+      self:padPosition()
+    end
+  end
+end
+
+function Animation:pause()
+  self.status = "paused"
+end
+
+function Animation:resume()
+  self.status = "playing"
+end
 -----------------------------------------------------------
 
 local anim8 = {
