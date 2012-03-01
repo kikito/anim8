@@ -1,0 +1,3 @@
+h1. anim8 demo
+
+This is a small demo for "anim8":http://github.com/kikito/anim8 . You will need "LÖVE":http://love2d.org in order to run it.
