@@ -16,10 +16,19 @@ local Quadmt = {
   end
 }
 
+local lastDrawq = nil
+
 love = {
   graphics = {
     newQuad = function(...)
       return setmetatable({...}, Quadmt)
+    end,
+    drawq = function(...)
+      lastDrawq = {...}
+    end,
+    getLastDrawq = function()
+      return lastDrawq
     end
+
   }
 }

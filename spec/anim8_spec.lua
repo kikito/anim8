@@ -2,7 +2,9 @@ require 'spec.love-mocks'
 
 local anim8 = require 'anim8'
 
-local lgnq = love.graphics.newQuad
+local newQuad   = love.graphics.newQuad
+local getLastDrawq = love.graphics.getLastDrawq
+
 local newGrid = anim8.newGrid
 local newAnimation = anim8.newAnimation
 
@@ -43,15 +45,15 @@ describe("anim8", function()
       local g, f
       before(function()
         g = newGrid(16,16,64,64)
-        f = function(x,y) return lgnq(x,y, 16,16, 64,64) end
+        nq = function(x,y) return newQuad(x,y, 16,16, 64,64) end
       end)
 
       describe("with 2 integers", function()
         it("returns a single frame", function()
-          assert_equal(f(0,0), g:getFrames(1,1)[1])
+          assert_equal(nq(0,0), g:getFrames(1,1)[1])
         end)
         it("returns another single frame", function()
-          assert_equal(f(32,16), g:getFrames(3,2)[1])
+          assert_equal(nq(32,16), g:getFrames(3,2)[1])
         end)
         it("throws an error if the frame does not exist", function()
           assert_error(function() g:getFrames(10,10) end)
@@ -61,15 +63,15 @@ describe("anim8", function()
       describe("with several pairs of integers", function()
         it("returns a list of frames", function()
           local frames = g:getFrames(1,3, 2,2, 3,1)
-          assert_equivalent({f(0,32), f(16,16), f(32,0)}, frames)
+          assert_equivalent({nq(0,32), nq(16,16), nq(32,0)}, frames)
         end)
       end)
 
       describe("with a string", function()
         it("returns a list of frames", function()
           local frames = g:getFrames('1-2,2')
-          assert_equal(f(0,16) , frames[1])
-          assert_equal(f(16,16), frames[2])
+          assert_equal(nq(0,16) , frames[1])
+          assert_equal(nq(16,16), frames[2])
         end)
         it("throws an error for invalid strings", function()
           assert_error(function() g:getFrames('foo') end)
@@ -84,14 +86,14 @@ describe("anim8", function()
       describe("with several strings", function()
         it("returns a list of frames", function()
           local frames = g:getFrames('1-2,2', '3,2')
-          assert_equivalent({f(0,16), f(16,16), f(32,16)}, frames)
+          assert_equivalent({nq(0,16), nq(16,16), nq(32,16)}, frames)
         end)
       end)
 
       describe("with strings mixed up with numbers", function()
         it("returns a list of frames", function()
           local frames = g:getFrames('1-2,2', 3,2)
-          assert_equivalent({f(0,16), f(16,16), f(32,16)}, frames)
+          assert_equivalent({nq(0,16), nq(16,16), nq(32,16)}, frames)
         end)
       end)
 
@@ -272,6 +274,16 @@ describe("anim8", function()
         a:update(1.1)
         a:gotoFrame(1)
         assert_equal(1, a.position)
+      end)
+    end)
+
+    describe(":draw", function()
+      it("invokes love.graphics.drawq with the expected parameters", function()
+        local img, frame1, frame2, frame3 = {},{},{},{}
+        local a   = newAnimation("loop", {frame1, frame2, frame3}, 1)
+        a:draw(img, 10, 20, 0, 1,2,3,4)
+        assert_equivalent({img, frame1, 10, 20, 0, 1,2,3,4}, getLastDrawq())
+
       end)
     end)
   end)

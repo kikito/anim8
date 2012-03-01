@@ -228,6 +228,12 @@ end
 function Animation:gotoFrame(position)
   self.position = position
 end
+
+function Animation:draw(image, x, y, r, sx, sy, ox, oy)
+  local frame = self.frames[self.position]
+  love.graphics.drawq(image, frame, x, y, r, sx, sy, ox, oy)
+end
+
 -----------------------------------------------------------
 
 local anim8 = {
