@@ -16,8 +16,8 @@ end
 
 local function createFrame(self, x, y)
   return love.graphics.newQuad(
-    (x-1) * self.frameWidth,
-    (y-1) * self.frameHeight,
+    (x-1) * self.frameWidth + x * self.borderWidth,
+    (y-1) * self.frameHeight + y * self.borderWidth,
     self.frameWidth,
     self.frameHeight,
     self.imageWidth,
@@ -25,9 +25,9 @@ local function createFrame(self, x, y)
   )
 end
 
-local function getGridKey(frameWidth, frameHeight, imageWidth, imageHeight)
+local function getGridKey(frameWidth, frameHeight, imageWidth, imageHeight, borderWidth)
   return table.concat(
-    { frameWidth, frameHeight, imageWidth, imageHeight },
+    { frameWidth, frameHeight, imageWidth, imageHeight, borderWidth },
     '-'
   )
 end
@@ -108,20 +108,24 @@ local Gridmt = {
   __call  = Grid.getFrames
 }
 
-local function newGrid(frameWidth, frameHeight, imageWidth, imageHeight)
+local function newGrid(frameWidth, frameHeight, imageWidth, imageHeight, borderWidth)
   assertPositiveInteger(frameWidth,  "frameWidth")
   assertPositiveInteger(frameHeight, "frameHeight")
   assertPositiveInteger(imageWidth,  "imageWidth")
   assertPositiveInteger(imageHeight, "imageHeight")
 
+  borderWidth = borderWidth or 0
+
+  local key  = getGridKey(frameWidth, frameHeight, imageWidth, imageHeight, borderWidth)
   local grid = setmetatable(
     { frameWidth  = frameWidth,
       frameHeight = frameHeight,
       imageWidth  = imageWidth,
       imageHeight = imageHeight,
+      borderWidth = borderWidth,
       width       = math.floor(imageWidth/frameWidth),
       height      = math.floor(imageHeight/frameHeight),
-      _key        = getGridKey(frameWidth, frameHeight, imageWidth, imageHeight)
+      _key        = key
     },
     Gridmt
   )
