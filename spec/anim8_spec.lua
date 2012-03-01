@@ -101,6 +101,15 @@ describe("anim8", function()
         end)
       end)
 
+      describe("When two similar grids are requested for the same quad", function()
+        it("is not created twice", function()
+          local g2 = newGrid(16,16,64,64)
+          local q1 = setmetatable(g:getFrames(1,1)[1], nil)
+          local q2 = setmetatable(g2:getFrames(1,1)[1], nil)
+          assert_equal(q1, q2)
+        end)
+      end)
+
     end)
 
     describe("()", function()
@@ -222,6 +231,18 @@ describe("anim8", function()
           assert_equal(3, a.position)
         end)
       end)
+
+      describe("When there are different delays per frame", function()
+        it("moves the frame correctly", function()
+          local a = newAnimation("loop", {1,2,3,4}, 1, {[2]=2})
+          a:update(1.1)
+          assert_equal(2, a.position)
+          a:update(1.1)
+          assert_equal(2, a.position)
+          a:update(1.1)
+          assert_equal(3, a.position)
+        end)
+      end)
     end)
 
     describe(":pause", function()
@@ -245,9 +266,14 @@ describe("anim8", function()
       end)
     end)
 
-
-
+    describe(":gotoFrame", function()
+      it("moves the position to the frame specified", function()
+        local a = newAnimation("loop", {1,2,3,4}, 1)
+        a:update(1.1)
+        a:gotoFrame(1)
+        assert_equal(1, a.position)
+      end)
+    end)
   end)
-
 
 end)

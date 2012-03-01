@@ -6,6 +6,8 @@
 
 local Grid = {}
 
+local _frames = {}
+
 local function assertPositiveInteger(value, name)
   if type(value) ~= 'number' then error(("%s should be a number, was %q"):format(name, tostring(value))) end
   if value < 1 then error(("%s should be a positive number, was %d"):format(name, value)) end
@@ -23,13 +25,23 @@ local function createFrame(self, x, y)
   )
 end
 
+local function getGridKey(frameWidth, frameHeight, imageWidth, imageHeight)
+  return table.concat(
+    { frameWidth, frameHeight, imageWidth, imageHeight },
+    '-'
+  )
+end
+
+
 local function getOrCreateFrame(self, x, y)
   if x < 1 or x > self.width or y < 1 or y > self.height then
     error(("There is no frame for x=%d, y=%d"):format(x, y))
   end
-  self._frames[x] = self._frames[x] or {}
-  self._frames[x][y] = self._frames[x][y] or createFrame(self, x, y)
-  return self._frames[x][y]
+  local key = self._key
+  _frames[key]       = _frames[key]       or {}
+  _frames[key][x]    = _frames[key][x]    or {}
+  _frames[key][x][y] = _frames[key][x][y] or createFrame(self, x, y)
+  return _frames[key][x][y]
 end
 
 local function parseInterval(str)
@@ -109,7 +121,7 @@ local function newGrid(frameWidth, frameHeight, imageWidth, imageHeight)
       imageHeight = imageHeight,
       width       = math.floor(imageWidth/frameWidth),
       height      = math.floor(imageHeight/frameHeight),
-      _frames = {}
+      _key        = getGridKey(frameWidth, frameHeight, imageWidth, imageHeight)
     },
     Gridmt
   )
@@ -211,6 +223,10 @@ end
 
 function Animation:resume()
   self.status = "playing"
+end
+
+function Animation:gotoFrame(position)
+  self.position = position
 end
 -----------------------------------------------------------
 
