@@ -4,15 +4,15 @@ Animation library for "LÖVE":http://love2d.org .
 
 It divides animations into two parts: grids and animations.
 
-@anim8.newGrid(frameWidth, frameHeight, imageWidth, imageHeight)@:
+@anim8.newGrid(frameWidth, frameHeight, imageWidth, imageHeight, left, top, border)@:
 
 Creates a *Grid*. Grids are useful for quickly defining frames (in LÖVE
-terminology, they are called *Quads*.
+terminology, they are called *Quads*. The last 3 parameters are optional.
 
-@anim8.newAnimation(mode, defaultDelay, frames, delays)@:
+@anim8.newAnimation(mode, frames, defaultDelay, delays)@:
 
 Creates a new *Animation*. Animations can be updated and drawn (they
-need a target image to do that).
+need a target image to do that). @delays@ is optional
 
 h1. Example 
 
@@ -43,10 +43,18 @@ h2. Grids
 Grids have only one purpose: To build groups of quads of the same 
 size as easily as possible. In order to do this, they need to know only
 2 things: the size of each quad and the size of the image they will be
-applied two. Each size is a width and a height, and those are the 4
-parameters of @anim8.newGrid@
+applied two. Each size is a width and a height, and those are the first 4
+parameters of @anim8.newGrid@.
 
-Grids only have one important method: @Grid:getFrames(...)@. 
+Grids are just a convenient way of getting frames from a sprite. Frames are
+assumed to be distributed in rows and columns. Frame 1,1 is the one in the
+first row, first column.
+
+The last 3 parameters of newGrid default to 0. They are called @left@, @right@
+@border@. They allow you to handle those cases in which the frames start slightly
+up or left, or have "borders" that must be ignored.
+
+Grids only have one important method: @Grid:getFrames(...)@.
 
 @Grid:getFrames@ accepts an arbitrary number of parameters. They can be
 either numbers or strings.
@@ -78,7 +86,7 @@ h2. Animations
 Animations are groups of frames that are interchanged every now and
 then.
 
-@anim8.newAnimation(mode, defaultDelay, frames, delays)@:
+@anim8.newAnimation(mode, frames, defaultDelay, delays)@:
 
 @mode@ can have three different values:
 
@@ -90,19 +98,21 @@ then.
   "going backwards" until it reaches the first frame again, and then
   "goes forward" again.
 
-@defaultDelay@ is the amount of time that the animation must spend on
-each frame, unless given other orders. It must be a positive number.
 
 @frames@ is an array of frames (Quads in LÖVE argot). You could provide
 your own quad array if you wanted to, but using a grid to get them is
 very convenient.
 
+@defaultDelay@ is the amount of time that the animation must spend on
+each frame, unless given other orders. It must be a positive number.
+
 @delays@ is an optional parameter. It specifies individual delays for
 frames. You can specify delays for all frames, like this: @{0.1, 0.5,
 0.1}@ or you can specify delays only for some frames, and leave the rest
-by default: @{[2]=0.5}@.
+by default: @{[2]=0.5}@. Finally, you can also use strings to denote
+ranges: @{'3-5'=0.2}@.
 
-Animations have some very useful methods:
+Animations have the following methods:
 
 @Animation:update(dt)@
 
@@ -112,7 +122,8 @@ according to the time that has passed.
 @Animation:draw(image, x,y, angle, sx, sy, ox, oy)@
 
 Draws the current frame in the specified coordinates with the right
-angle, scale and offset.
+angle, scale and offset. These parameters work exacly the same way as in
+"love.graphics.drawq":https://love2d.org/wiki/love.graphics.drawq .
 
 @Animation:gotoFrame(frame)@
 
