@@ -15,21 +15,19 @@ local function assertPositiveInteger(value, name)
 end
 
 local function createFrame(self, x, y)
+  local fw, fh = self.frameWidth, self.frameHeight
   return love.graphics.newQuad(
-    (x-1) * self.frameWidth + x * self.borderWidth,
-    (y-1) * self.frameHeight + y * self.borderWidth,
-    self.frameWidth,
-    self.frameHeight,
+    self.left + (x-1) * fw + x * self.border,
+    self.top  + (y-1) * fh + y * self.border,
+    fw,
+    fh,
     self.imageWidth,
     self.imageHeight
   )
 end
 
-local function getGridKey(frameWidth, frameHeight, imageWidth, imageHeight, borderWidth)
-  return table.concat(
-    { frameWidth, frameHeight, imageWidth, imageHeight, borderWidth },
-    '-'
-  )
+local function getGridKey(...)
+  return table.concat( {...} ,'-' )
 end
 
 
@@ -108,21 +106,26 @@ local Gridmt = {
   __call  = Grid.getFrames
 }
 
-local function newGrid(frameWidth, frameHeight, imageWidth, imageHeight, borderWidth)
+local function newGrid(frameWidth, frameHeight, imageWidth, imageHeight, left, top, border)
   assertPositiveInteger(frameWidth,  "frameWidth")
   assertPositiveInteger(frameHeight, "frameHeight")
   assertPositiveInteger(imageWidth,  "imageWidth")
   assertPositiveInteger(imageHeight, "imageHeight")
 
-  borderWidth = borderWidth or 0
+  left   = left   or 0
+  top    = top    or 0
+  border = border or 0
 
-  local key  = getGridKey(frameWidth, frameHeight, imageWidth, imageHeight, borderWidth)
+  local key  = getGridKey(frameWidth, frameHeight, imageWidth, imageHeight, left, top, border)
+
   local grid = setmetatable(
     { frameWidth  = frameWidth,
       frameHeight = frameHeight,
       imageWidth  = imageWidth,
       imageHeight = imageHeight,
-      borderWidth = borderWidth,
+      left        = left,
+      top         = top,
+      border      = border,
       width       = math.floor(imageWidth/frameWidth),
       height      = math.floor(imageHeight/frameHeight),
       _key        = key
