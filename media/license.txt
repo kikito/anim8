@@ -1,0 +1,6 @@
+The accompaning png file is a slightly modified version of the one that
+can be found in Spritelib:
+
+http://www.widgetworx.com/widgetworx/portfolio/spritelib.html
+
+Released under the terms of the Public Common License
