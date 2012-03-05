@@ -6,13 +6,11 @@ It divides animations into two parts: grids and animations.
 
 @anim8.newGrid(frameWidth, frameHeight, imageWidth, imageHeight, left, top, border)@:
 
-Creates a *Grid*. Grids are useful for quickly defining frames (in LÖVE
-terminology, they are called *Quads*. The last 3 parameters are optional.
+Creates a *Grid*. Grids are useful for quickly defining frames (in LÖVE terminology, they are called *Quads*. The last 3 parameters are optional.
 
 @anim8.newAnimation(mode, frames, defaultDelay, delays)@:
 
-Creates a new *Animation*. Animations can be updated and drawn (they
-need a target image to do that). @delays@ is optional
+Creates a new *Animation*. Animations can be updated and drawn (they need a target image to do that). @delays@ is optional
 
 h1. Example 
 
@@ -40,38 +38,21 @@ h1. Explanation
 
 h2. Grids
 
-Grids have only one purpose: To build groups of quads of the same 
-size as easily as possible. In order to do this, they need to know only
-2 things: the size of each quad and the size of the image they will be
-applied two. Each size is a width and a height, and those are the first 4
-parameters of @anim8.newGrid@.
+Grids have only one purpose: To build groups of quads of the same size as easily as possible. In order to do this, they need to know only 2 things: the size of each quad and the size of the image they will be applied two. Each size is a width and a height, and those are the first 4 parameters of @anim8.newGrid@.
 
-Grids are just a convenient way of getting frames from a sprite. Frames are
-assumed to be distributed in rows and columns. Frame 1,1 is the one in the
-first row, first column.
+Grids are just a convenient way of getting frames from a sprite. Frames are assumed to be distributed in rows and columns. Frame 1,1 is the one in the first row, first column.
 
-The last 3 parameters of newGrid default to 0. They are called @left@, @right@
-@border@. They allow you to handle those cases in which the frames start slightly
-up or left, or have "borders" that must be ignored.
+The last 3 parameters of newGrid default to 0. They are called @left@, @right@ @border@. They allow you to handle those cases in which the frames start slightly up or left, or have "borders" that must be ignored.
 
 Grids only have one important method: @Grid:getFrames(...)@.
 
 @Grid:getFrames@ accepts an arbitrary number of parameters. They can be
 either numbers or strings.
 
-* Each two numbers are interpreted as quad coordinates. This way,
-  @grid:getFrames(3,4)@ will return the frame in column 3, row 4 of the
-  grid. There can be more than just two: @grid:getFrames(1,1, 1,2, 1,3)@
-  will return the frames in {1,1}, {1,2} and {1,3} respectively. 
-* Using numbers for long rows is tedious - so grids also accept strings.
-  The previous row of 3 elements, for example, can be also expressed
-  like this: @grid:getFrames('1,1-3')@ . Again, there can be more than
-  one string (@grid:getFrames('1,1-3', '2-4,3')@) and it's also possible
-  to combine them with numbers (@grid:getFrames(1,4, '1,1-3'))
+* Each two numbers are interpreted as quad coordinates. This way, @grid:getFrames(3,4)@ will return the frame in column 3, row 4 of the grid. There can be more than just two: @grid:getFrames(1,1, 1,2, 1,3)@ will return the frames in {1,1}, {1,2} and {1,3} respectively. 
+* Using numbers for long rows is tedious - so grids also accept strings. The previous row of 3 elements, for example, can be also expressed like this: @grid:getFrames('1,1-3')@ . Again, there can be more than one string (@grid:getFrames('1,1-3', '2-4,3')@) and it's also possible to combine them with numbers (@grid:getFrames(1,4, '1,1-3'))
 
-But you will probably never use getFrames directly. 
-You can use a grid as if it was a function, and getFrames will be
-called. In other words, given a grid called @g@, this:
+But you will probably never use getFrames directly. You can use a grid as if it was a function, and getFrames will be called. In other words, given a grid called @g@, this:
 
 <pre>g:getFrames('2-8,1', 1,2)</pre>
 
@@ -83,47 +64,32 @@ This is very convenient to use in animations.
 
 h2. Animations
 
-Animations are groups of frames that are interchanged every now and
-then.
+Animations are groups of frames that are interchanged every now and then.
 
 @anim8.newAnimation(mode, frames, defaultDelay, delays)@:
 
 @mode@ can have three different values:
 
-* @"loop"@ is the most used one. Once an animation reaches the last
-  frame, it starts with the first one again.
-* @"once"@: the animation that gets repeated only once, and then stays
-  on the last frame forever (or until reset).
-* @"bounce"@: when the animation reaches the last frame, it starts
-  "going backwards" until it reaches the first frame again, and then
-  "goes forward" again.
+* @"loop"@ is the most used one. Once an animation reaches the last frame, it starts with the first one again.
+* @"once"@: the animation that gets repeated only once, and then stays on the last frame forever (or until reset).
+* @"bounce"@: when the animation reaches the last frame, it starts "going backwards" until it reaches the first frame again, and then "goes forward" again.
 
 
-@frames@ is an array of frames (Quads in LÖVE argot). You could provide
-your own quad array if you wanted to, but using a grid to get them is
-very convenient.
+@frames@ is an array of frames (Quads in LÖVE argot). You could provide your own quad array if you wanted to, but using a grid to get them is very convenient.
 
-@defaultDelay@ is the amount of time that the animation must spend on
-each frame, unless given other orders. It must be a positive number.
+@defaultDelay@ is the amount of time that the animation must spend on each frame, unless given other orders. It must be a positive number.
 
-@delays@ is an optional parameter. It specifies individual delays for
-frames. You can specify delays for all frames, like this: @{0.1, 0.5,
-0.1}@ or you can specify delays only for some frames, and leave the rest
-by default: @{[2]=0.5}@. Finally, you can also use strings to denote
-ranges: @{'3-5'=0.2}@.
+@delays@ is an optional parameter. It specifies individual delays for frames. You can specify delays for all frames, like this: @{0.1, 0.5, 0.1}@ or you can specify delays only for some frames, and leave the rest by default: @{[2]=0.5}@. Finally, you can also use strings to denote ranges: @{'3-5'=0.2}@.
 
 Animations have the following methods:
 
 @Animation:update(dt)@
 
-Use this inside @love.update(dt)@ so that your animation changes frames
-according to the time that has passed.
+Use this inside @love.update(dt)@ so that your animation changes frames according to the time that has passed.
 
 @Animation:draw(image, x,y, angle, sx, sy, ox, oy)@
 
-Draws the current frame in the specified coordinates with the right
-angle, scale and offset. These parameters work exacly the same way as in
-"love.graphics.drawq":https://love2d.org/wiki/love.graphics.drawq .
+Draws the current frame in the specified coordinates with the right angle, scale and offset. These parameters work exacly the same way as in "love.graphics.drawq":https://love2d.org/wiki/love.graphics.drawq .
 
 @Animation:gotoFrame(frame)@
 
@@ -131,8 +97,7 @@ Moves the animation to a given frame (frames start counting in 1).
 
 @Animation:pause()@
 
-Stops the animation from updating (@animation:update(dt)@ will have no
-effect)
+Stops the animation from updating (@animation:update(dt)@ will have no effect)
 
 @Animation:resume()@
 
@@ -141,13 +106,11 @@ Unpauses an animation
 
 h1. Installation
 
-Just copy the anim8.lua file wherever you want it. Then require it
-wherever you need it:
+Just copy the anim8.lua file wherever you want it. Then require it wherever you need it:
 
 <pre>local anim8 = require 'anim8'</pre>
 
-Please make sure that you read the license, too (for your convenience
-it's included at the beginning of the anim8.lua file).
+Please make sure that you read the license, too (for your convenience it's included at the beginning of the anim8.lua file).
 
 h1. Specs
 
