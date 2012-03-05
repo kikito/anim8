@@ -46,11 +46,10 @@ The last 3 parameters of newGrid default to 0. They are called @left@, @right@ @
 
 Grids only have one important method: @Grid:getFrames(...)@.
 
-@Grid:getFrames@ accepts an arbitrary number of parameters. They can be
-either numbers or strings.
+@Grid:getFrames@ accepts an arbitrary number of parameters. They can be either numbers or strings.
 
 * Each two numbers are interpreted as quad coordinates. This way, @grid:getFrames(3,4)@ will return the frame in column 3, row 4 of the grid. There can be more than just two: @grid:getFrames(1,1, 1,2, 1,3)@ will return the frames in {1,1}, {1,2} and {1,3} respectively. 
-* Using numbers for long rows is tedious - so grids also accept strings. The previous row of 3 elements, for example, can be also expressed like this: @grid:getFrames('1,1-3')@ . Again, there can be more than one string (@grid:getFrames('1,1-3', '2-4,3')@) and it's also possible to combine them with numbers (@grid:getFrames(1,4, '1,1-3'))
+* Using numbers for long rows is tedious - so grids also accept strings. The previous row of 3 elements, for example, can be also expressed like this: @grid:getFrames('1,1-3')@ . Again, there can be more than one string (@grid:getFrames('1,1-3', '2-4,3')@) and it's also possible to combine them with numbers (@grid:getFrames(1,4, '1,1-3')@)
 
 But you will probably never use getFrames directly. You can use a grid as if it was a function, and getFrames will be called. In other words, given a grid called @g@, this:
 
