@@ -50,15 +50,17 @@ local function parseInterval(str)
     max = min
   end
   assert(min and max, ("Could not parse interval from %q"):format(str))
-  return tonumber(min), tonumber(max)
+  min, max = tonumber(min), tonumber(max)
+  local step = min <= max and 1 or -1
+  return min, max, step
 end
 
 local function parseIntervals(str)
   local left, right = str:match("(.+),(.+)")
   assert(left and right, ("Could not parse intervals from %q"):format(str))
-  local minx, maxx = parseInterval(left)
-  local miny, maxy = parseInterval(right)
-  return minx, miny, maxx, maxy
+  local minx, maxx, stepx = parseInterval(left)
+  local miny, maxy, stepy = parseInterval(right)
+  return minx, maxx, stepx, miny, maxy, stepy
 end
 
 local function parseFrames(self, args, result, position)
@@ -72,9 +74,9 @@ local function parseFrames(self, args, result, position)
 
   elseif kind == 'string' then
 
-    local minx, miny, maxx, maxy = parseIntervals(current)
-    for x = minx, maxx do
-      for y = miny, maxy do
+    local minx, maxx, stepx, miny, maxy, stepy  = parseIntervals(current)
+    for x = minx, maxx, stepx do
+      for y = miny, maxy, stepy do
         result[#result+1] = getOrCreateFrame(self,x,y)
       end
     end
@@ -147,14 +149,14 @@ end
 
 local function parseDelays(delays)
   local parsedDelays = {}
-  local tk,min,max
+  local tk,min,max,step
   for k,v in pairs(delays) do
     tk = type(k)
     if     tk == "number"
       then parsedDelays[k] = v
     elseif tk == "string" then
-      min, max = parseInterval(k)
-      for i = min,max do parsedDelays[i] = v end
+      min, max, step = parseInterval(k)
+      for i = min,max,step do parsedDelays[i] = v end
     else
       error(("Unexpected delay key: [%s]. Expected a number or a string"):format(tostring(k)))
     end
