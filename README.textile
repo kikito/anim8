@@ -22,7 +22,7 @@ local image, animation
 function love.load()
   image = love.graphics.newImage('path/to/image.png')
   local g = anim8.newGrid(32, 32, image:getWidth(), image:getHeight())
-  animation = anim8.newAnimation('loop', 0.1, g('1-8,1'))
+  animation = anim8.newAnimation('loop', g('1-8,1'), 0.1)
 end
 
 function love.update(dt)
