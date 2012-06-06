@@ -184,7 +184,10 @@ end
 
 local animationModes = {
   loop   = function(self) self.position = 1 end,
-  once   = function(self) self.position = #self.frames end,
+  once   = function(self)
+    self.position = #self.frames
+    self.status = "finished"
+  end,
   bounce = function(self)
     self.direction = self.direction * -1
     self.position = self.position + self.direction + self.direction
@@ -201,7 +204,7 @@ local function newAnimation(mode, frames, defaultDelay, delays)
   return setmetatable({
       mode        = mode,
       frames      = cloneArray(frames),
-      padPosition = animationModes[mode],
+      endSequence = animationModes[mode],
       delays      = createDelays(frames, defaultDelay, delays),
       timer       = 0,
       position    = 1,
@@ -221,7 +224,7 @@ function Animation:update(dt)
     self.timer = self.timer - self.delays[self.position]
     self.position = self.position + self.direction
     if self.position < 1 or self.position > #self.frames then
-      self:padPosition()
+      self:endSequence()
     end
   end
 end
