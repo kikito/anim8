@@ -317,6 +317,26 @@ describe("anim8", function()
 
       end)
     end)
+
+    describe(":clone", function()
+      it("returns a new animation with the same properties - but reset to the initial frame", function()
+        local frames = {1,2,3,4}
+        local a = newAnimation("loop", frames, 1)
+        a:update(1)
+        a:pause()
+        local b = a:clone()
+        assert_equal(      "loop", b.mode)
+        assert_not_equal(  frames, b.frames)
+        assert_equivalent( frames, b.frames)
+        assert_equivalent( a.delays, b.delays)
+        assert_equal(      0, b.timer)
+        assert_equal(      1, b.position)
+        assert_equal(      1, b.direction)
+        assert_equal(     "playing", b.status )
+      end)
+    end)
+
+
   end)
 
 end)

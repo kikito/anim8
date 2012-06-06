@@ -215,6 +215,10 @@ local function newAnimation(mode, frames, defaultDelay, delays)
   )
 end
 
+function Animation:clone()
+  return newAnimation(self.mode, self.frames, 1, self.delays)
+end
+
 function Animation:update(dt)
   if self.status ~= "playing" then return end
 
