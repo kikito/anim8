@@ -95,6 +95,15 @@ describe("anim8", function()
           assert_equal(nq(0,16) , frames[1])
           assert_equal(nq(16,16), frames[2])
         end)
+        it("parses rows first, then columns", function()
+          local frames = g:getFrames('1-3,1-3')
+          assert_equivalent({ nq(0,0),  nq(16,0),  nq(32,0),
+                              nq(0,16), nq(16,16), nq(32,16),
+                              nq(0,32), nq(16,32), nq(32,32)
+                            },
+                            frames
+                           )
+        end)
         it("throws an error for invalid strings", function()
           assert_error(function() g:getFrames('foo') end)
           assert_error(function() g:getFrames('foo,bar') end)

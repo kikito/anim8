@@ -75,8 +75,8 @@ local function parseFrames(self, args, result, position)
   elseif kind == 'string' then
 
     local minx, maxx, stepx, miny, maxy, stepy  = parseIntervals(current)
-    for x = minx, maxx, stepx do
-      for y = miny, maxy, stepy do
+    for y = miny, maxy, stepy do
+      for x = minx, maxx, stepx do
         result[#result+1] = getOrCreateFrame(self,x,y)
       end
     end
