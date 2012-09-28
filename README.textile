@@ -78,7 +78,7 @@ Animations are groups of frames that are interchanged every now and then.
 
 @defaultDelay@ is the amount of time that the animation must spend on each frame, unless given other orders. It must be a positive number.
 
-@delays@ is an optional parameter. It specifies individual delays for frames. You can specify delays for all frames, like this: @{0.1, 0.5, 0.1}@ or you can specify delays only for some frames, and leave the rest by default: @{[2]=0.5}@. Finally, you can also use strings to denote ranges: @{'3-5'=0.2}@.
+@delays@ is an optional parameter. It specifies individual delays for frames. You can specify delays for all frames, like this: @{0.1, 0.5, 0.1}@ or you can specify delays only for some frames, and leave the rest by default: @{[2]=0.5}@. Finally, you can also use strings to denote ranges: @{['3-5']=0.2}@.
 
 Animations have the following methods:
 
