@@ -163,10 +163,11 @@ describe("anim8", function()
 
     describe(":draw", function()
       it("invokes love.graphics.drawq with the expected parameters", function()
+        spy.on(love.graphics, 'drawq')
         local img, frame1, frame2, frame3 = {},{},{},{}
         local a   = newAnimation("loop", {frame1, frame2, frame3}, 1)
         a:draw(img, 10, 20, 0, 1,2,3,4)
-        assert.same({img, frame1, 10, 20, 0, 1,2,3,4}, love.graphics.getLastDrawq())
+        assert.spy(love.graphics.drawq).was.called_with(img, frame1, 10, 20, 0, 1,2,3,4)
       end)
     end)
 
