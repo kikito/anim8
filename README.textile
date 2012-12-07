@@ -8,9 +8,9 @@ It divides animations into two parts: grids and animations.
 
 Creates a *Grid*. Grids are useful for quickly defining frames (in LÖVE terminology, they are called *Quads*. The last 3 parameters are optional.
 
-@anim8.newAnimation(mode, frames, defaultDelay, delays)@:
+@anim8.newAnimation(mode, frames, defaultDelay, delays, flippedH, flippedV)@:
 
-Creates a new *Animation*. Animations can be updated and drawn (they need a target image to do that). @delays@ is optional
+Creates a new *Animation*. Animations can be updated and drawn (they need a target image to do that). @delays@ is optional, @flippedH@ and @flippedV@ are optional.
 
 h1. Example
 
@@ -65,7 +65,7 @@ h2. Animations
 
 Animations are groups of frames that are interchanged every now and then.
 
-@anim8.newAnimation(mode, frames, defaultDelay, delays)@:
+@anim8.newAnimation(mode, frames, defaultDelay, delays, flippedH, flippedV)@:
 
 @mode@ can have three different values:
 
@@ -79,6 +79,8 @@ Animations are groups of frames that are interchanged every now and then.
 @defaultDelay@ is the amount of time that the animation must spend on each frame, unless given other orders. It must be a positive number.
 
 @delays@ is an optional parameter. It specifies individual delays for frames. You can specify delays for all frames, like this: @{0.1, 0.5, 0.1}@ or you can specify delays only for some frames, and leave the rest by default: @{[2]=0.5}@. Finally, you can also use strings to denote ranges: @{['3-5']=0.2}@.
+
+@flippedH@ and @flippedV@ will make the animation horizontally or vertically flipped if set to true. This can be changed later on by using the @flipH@ and @flipV@ methods. The quads that conform the animation are not affected by this change; it only affects the way they are drawn on this particular animation, not globally.
 
 Animations have the following methods:
 
@@ -101,6 +103,20 @@ Stops the animation from updating (@animation:update(dt)@ will have no effect)
 @Animation:resume()@
 
 Unpauses an animation
+
+@Animation:clone()@
+
+Creates a new animation identical to the current one. The only difference is that its internal counter is reset to 0 (it's on the first frame).
+
+@Animation:flipH()@
+
+Flips an animation horizontally (left goes to right and viceversa). This means that the frames are simply drawn differently, nothing more.
+
+Note that this method does not create a new animation. If you want to create a new one, use the @clone@ method.
+
+@Animation:flipV()@
+
+Flips an animation vertically. The same rules that apply to @flipH@ also apply here.
 
 
 h1. Installation

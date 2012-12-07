@@ -13,8 +13,13 @@ local Quadmt = {
       buffer[i] = tostring(v)
     end
     return "quad: {" .. table.concat(buffer, ",") .. "}"
+  end,
+  getViewport = function(self)
+    return unpack(self)
   end
 }
+
+Quadmt.__index = Quadmt
 
 love = {
   graphics = {

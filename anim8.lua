@@ -196,7 +196,7 @@ local animationModes = {
 
 local Animationmt = { __index = Animation }
 
-local function newAnimation(mode, frames, defaultDelay, delays)
+local function newAnimation(mode, frames, defaultDelay, delays, flippedH, flippedV)
   delays = delays or {}
   assert(animationModes[mode], ("%q is not a valid mode"):format(tostring(mode)))
   assert(type(defaultDelay) == 'number' and defaultDelay > 0, "defaultDelay must be a positive number" )
@@ -209,14 +209,24 @@ local function newAnimation(mode, frames, defaultDelay, delays)
       timer       = 0,
       position    = 1,
       direction   = 1,
-      status      = "playing"
+      status      = "playing",
+      flippedH    = not not flippedH,
+      flippedV    = not not flippedV
     },
     Animationmt
   )
 end
 
 function Animation:clone()
-  return newAnimation(self.mode, self.frames, 1, self.delays)
+  return newAnimation(self.mode, self.frames, 1, self.delays, self.flippedH, self.flippedV)
+end
+
+function Animation:flipH()
+  self.flippedH = not self.flippedH
+end
+
+function Animation:flipV()
+  self.flippedV = not self.flippedV
 end
 
 function Animation:update(dt)
@@ -245,9 +255,16 @@ function Animation:gotoFrame(position)
   self.position = position
 end
 
-function Animation:draw(image, x, y, r, sx, sy, ox, oy)
+function Animation:draw(image, x, y, r, sx, sy, ox, oy, ...)
   local frame = self.frames[self.position]
-  love.graphics.drawq(image, frame, x, y, r, sx, sy, ox, oy)
+  if self.flippedH or self.flippedV then
+    r,sx,sy,ox,oy = r or 0, sx or 1, sy or 1, ox or 0, oy or 0
+    local _,_,w,h = frame:getViewport()
+
+    if self.flippedH then sx, ox = sx * -1, ox + w end
+    if self.flippedV then sy, oy = sy * -1, oy + h end
+  end
+  love.graphics.drawq(image, frame, x, y, r, sx, sy, ox, oy, ...)
 end
 
 -----------------------------------------------------------

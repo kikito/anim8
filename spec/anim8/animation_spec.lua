@@ -186,6 +186,55 @@ describe("anim8", function()
         assert.equal(1, b.position)
         assert.equal(1, b.direction)
         assert.equal("playing", b.status )
+        assert.False(b.flippedH)
+        assert.False(b.flippedV)
+
+        a:flipV()
+        assert.True(a:clone().flippedV)
+
+        a:flipH()
+        assert.True(a:clone().flippedH)
+
+      end)
+    end)
+
+    describe(":flipH and :flipV", function()
+      local img, frame, a
+      before_each(function()
+        spy.on(love.graphics, 'drawq')
+        img = {}
+        frame = love.graphics.newQuad(1,2,3,4) -- x,y,width, height
+        a     = newAnimation("loop", {frame}, 1)
+      end)
+      it("defaults to non-flipped", function()
+        assert.False(a.flippedH)
+        assert.False(a.flippedV)
+      end)
+
+      it("can be set on creation", function()
+        local b = newAnimation("loop", {frame}, 1, {}, false, true)
+        assert.False(b.flippedH)
+        assert.True(b.flippedV)
+      end)
+
+      it("Flips the animation horizontally (does not create a clone)", function()
+        a:flipH()
+        a:draw(img, 10, 20, 0, 5,6,7,8)
+        assert.spy(love.graphics.drawq).was.called_with(img, frame, 10, 20, 0, -5,6,7+3,8)
+
+        a:flipH()
+        a:draw(img, 10, 20, 0, 5,6,7,8)
+        assert.spy(love.graphics.drawq).was.called_with(img, frame, 10, 20, 0, 5,6,7,8)
+      end)
+
+      it("Flips the animation vertically (does not create a clone)", function()
+        a:flipV()
+        a:draw(img, 10, 20, 0, 5,6,7,8)
+        assert.spy(love.graphics.drawq).was.called_with(img, frame, 10, 20, 0, 5,-6,7,8+4)
+
+        a:flipV()
+        a:draw(img, 10, 20, 0, 5,6,7,8)
+        assert.spy(love.graphics.drawq).was.called_with(img, frame, 10, 20, 0, 5,6,7,8)
       end)
     end)
 
