@@ -1,4 +1,4 @@
--- anim8 v1.1.1 - 2012-06
+-- anim8 v1.2.0 - 2012-06
 -- Copyright (c) 2011 Enrique García Cota
 -- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 -- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
@@ -261,8 +261,14 @@ function Animation:draw(image, x, y, r, sx, sy, ox, oy, ...)
     r,sx,sy,ox,oy = r or 0, sx or 1, sy or 1, ox or 0, oy or 0
     local _,_,w,h = frame:getViewport()
 
-    if self.flippedH then sx, ox = sx * -1, ox + w end
-    if self.flippedV then sy, oy = sy * -1, oy + h end
+    if self.flippedH then
+      sx = sx * -1
+      ox = w - ox
+    end
+    if self.flippedV then
+      sy = sy * -1
+      oy = h - oy
+    end
   end
   love.graphics.drawq(image, frame, x, y, r, sx, sy, ox, oy, ...)
 end

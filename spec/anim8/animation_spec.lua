@@ -220,7 +220,7 @@ describe("anim8", function()
       it("Flips the animation horizontally (does not create a clone)", function()
         a:flipH()
         a:draw(img, 10, 20, 0, 5,6,7,8)
-        assert.spy(love.graphics.drawq).was.called_with(img, frame, 10, 20, 0, -5,6,7+3,8)
+        assert.spy(love.graphics.drawq).was.called_with(img, frame, 10, 20, 0, -5,6,3-7,8)
 
         a:flipH()
         a:draw(img, 10, 20, 0, 5,6,7,8)
@@ -230,15 +230,12 @@ describe("anim8", function()
       it("Flips the animation vertically (does not create a clone)", function()
         a:flipV()
         a:draw(img, 10, 20, 0, 5,6,7,8)
-        assert.spy(love.graphics.drawq).was.called_with(img, frame, 10, 20, 0, 5,-6,7,8+4)
+        assert.spy(love.graphics.drawq).was.called_with(img, frame, 10, 20, 0, 5,-6,7,4-8)
 
         a:flipV()
         a:draw(img, 10, 20, 0, 5,6,7,8)
         assert.spy(love.graphics.drawq).was.called_with(img, frame, 10, 20, 0, 5,6,7,8)
       end)
     end)
-
-
   end)
-
 end)
