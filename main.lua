@@ -44,7 +44,6 @@ function love.draw()
   plane:draw(   image, 100, 400)
   seaplane:draw(image, 250, 432, seaplaneAngle, 1, 1, 32, 32)
   submarine:draw(image, 600, 100)
-
 end
 
 function love.update(dt)
@@ -56,4 +55,16 @@ function love.update(dt)
   submarine:update(dt)
 
   seaplaneAngle = seaplaneAngle + dt
+end
+
+function love.keypressed(key)
+  if key == 'escape' then love.event.quit() end
+
+  for i=1, #spinning do
+    spinning[i]:flipH()
+  end
+
+  plane:flipV()
+  seaplane:flipV(dt)
+  submarine:flipV(dt)
 end

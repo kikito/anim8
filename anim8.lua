@@ -1,4 +1,4 @@
--- anim8 v1.0.0 - 2012-02
+-- anim8 v1.2.0 - 2012-06
 -- Copyright (c) 2011 Enrique García Cota
 -- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 -- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
@@ -50,15 +50,17 @@ local function parseInterval(str)
     max = min
   end
   assert(min and max, ("Could not parse interval from %q"):format(str))
-  return tonumber(min), tonumber(max)
+  min, max = tonumber(min), tonumber(max)
+  local step = min <= max and 1 or -1
+  return min, max, step
 end
 
 local function parseIntervals(str)
   local left, right = str:match("(.+),(.+)")
   assert(left and right, ("Could not parse intervals from %q"):format(str))
-  local minx, maxx = parseInterval(left)
-  local miny, maxy = parseInterval(right)
-  return minx, miny, maxx, maxy
+  local minx, maxx, stepx = parseInterval(left)
+  local miny, maxy, stepy = parseInterval(right)
+  return minx, maxx, stepx, miny, maxy, stepy
 end
 
 local function parseFrames(self, args, result, position)
@@ -72,9 +74,9 @@ local function parseFrames(self, args, result, position)
 
   elseif kind == 'string' then
 
-    local minx, miny, maxx, maxy = parseIntervals(current)
-    for x = minx, maxx do
-      for y = miny, maxy do
+    local minx, maxx, stepx, miny, maxy, stepy  = parseIntervals(current)
+    for y = miny, maxy, stepy do
+      for x = minx, maxx, stepx do
         result[#result+1] = getOrCreateFrame(self,x,y)
       end
     end
@@ -147,14 +149,14 @@ end
 
 local function parseDelays(delays)
   local parsedDelays = {}
-  local tk,min,max
+  local tk,min,max,step
   for k,v in pairs(delays) do
     tk = type(k)
     if     tk == "number"
       then parsedDelays[k] = v
     elseif tk == "string" then
-      min, max = parseInterval(k)
-      for i = min,max do parsedDelays[i] = v end
+      min, max, step = parseInterval(k)
+      for i = min,max,step do parsedDelays[i] = v end
     else
       error(("Unexpected delay key: [%s]. Expected a number or a string"):format(tostring(k)))
     end
@@ -182,7 +184,10 @@ end
 
 local animationModes = {
   loop   = function(self) self.position = 1 end,
-  once   = function(self) self.position = #self.frames end,
+  once   = function(self)
+    self.position = #self.frames
+    self.status = "finished"
+  end,
   bounce = function(self)
     self.direction = self.direction * -1
     self.position = self.position + self.direction + self.direction
@@ -191,7 +196,7 @@ local animationModes = {
 
 local Animationmt = { __index = Animation }
 
-local function newAnimation(mode, frames, defaultDelay, delays)
+local function newAnimation(mode, frames, defaultDelay, delays, flippedH, flippedV)
   delays = delays or {}
   assert(animationModes[mode], ("%q is not a valid mode"):format(tostring(mode)))
   assert(type(defaultDelay) == 'number' and defaultDelay > 0, "defaultDelay must be a positive number" )
@@ -199,15 +204,29 @@ local function newAnimation(mode, frames, defaultDelay, delays)
   return setmetatable({
       mode        = mode,
       frames      = cloneArray(frames),
-      padPosition = animationModes[mode],
+      endSequence = animationModes[mode],
       delays      = createDelays(frames, defaultDelay, delays),
       timer       = 0,
       position    = 1,
       direction   = 1,
-      status      = "playing"
+      status      = "playing",
+      flippedH    = not not flippedH,
+      flippedV    = not not flippedV
     },
     Animationmt
   )
+end
+
+function Animation:clone()
+  return newAnimation(self.mode, self.frames, 1, self.delays, self.flippedH, self.flippedV)
+end
+
+function Animation:flipH()
+  self.flippedH = not self.flippedH
+end
+
+function Animation:flipV()
+  self.flippedV = not self.flippedV
 end
 
 function Animation:update(dt)
@@ -219,7 +238,7 @@ function Animation:update(dt)
     self.timer = self.timer - self.delays[self.position]
     self.position = self.position + self.direction
     if self.position < 1 or self.position > #self.frames then
-      self:padPosition()
+      self:endSequence()
     end
   end
 end
@@ -236,9 +255,22 @@ function Animation:gotoFrame(position)
   self.position = position
 end
 
-function Animation:draw(image, x, y, r, sx, sy, ox, oy)
+function Animation:draw(image, x, y, r, sx, sy, ox, oy, ...)
   local frame = self.frames[self.position]
-  love.graphics.drawq(image, frame, x, y, r, sx, sy, ox, oy)
+  if self.flippedH or self.flippedV then
+    r,sx,sy,ox,oy = r or 0, sx or 1, sy or 1, ox or 0, oy or 0
+    local _,_,w,h = frame:getViewport()
+
+    if self.flippedH then
+      sx = sx * -1
+      ox = w - ox
+    end
+    if self.flippedV then
+      sy = sy * -1
+      oy = h-oy
+    end
+  end
+  love.graphics.drawq(image, frame, x, y, r, sx, sy, ox, oy, ...)
 end
 
 -----------------------------------------------------------
