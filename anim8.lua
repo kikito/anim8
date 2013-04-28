@@ -147,33 +147,17 @@ local function createDelays(frames, defaultDelay, delays)
   return result
 end
 
-local animationModes = {
-  loop   = function(self) self.position = 1 end,
-  once   = function(self)
-    self.position = #self.frames
-    self.status = "finished"
-  end,
-  bounce = function(self)
-    self.direction = self.direction * -1
-    self.position = self.position + self.direction + self.direction
-  end
-}
-
 local Animationmt = { __index = Animation }
 
-local function newAnimation(mode, frames, defaultDelay, delays, flippedH, flippedV)
+local function newAnimation(frames, defaultDelay, delays, flippedH, flippedV)
   delays = delays or {}
-  assert(animationModes[mode], ("%q is not a valid mode"):format(tostring(mode)))
-  assert(type(defaultDelay) == 'number' and defaultDelay > 0, "defaultDelay must be a positive number" )
+  assert(type(defaultDelay) == 'number' and defaultDelay > 0, "defaultDelay must be a positive number. Was " .. tostring(defaultDelay) )
   assert(type(delays) == 'table', "delays must be a table or nil")
   return setmetatable({
-      mode        = mode,
       frames      = cloneArray(frames),
-      endSequence = animationModes[mode],
       delays      = createDelays(frames, defaultDelay, delays),
       timer       = 0,
       position    = 1,
-      direction   = 1,
       status      = "playing",
       flippedH    = not not flippedH,
       flippedV    = not not flippedV
@@ -183,7 +167,7 @@ local function newAnimation(mode, frames, defaultDelay, delays, flippedH, flippe
 end
 
 function Animation:clone()
-  return newAnimation(self.mode, self.frames, 1, self.delays, self.flippedH, self.flippedV)
+  return newAnimation(self.frames, 1, self.delays, self.flippedH, self.flippedV)
 end
 
 function Animation:flipH()
@@ -201,9 +185,9 @@ function Animation:update(dt)
 
   while self.timer > self.delays[self.position] do
     self.timer = self.timer - self.delays[self.position]
-    self.position = self.position + self.direction
-    if self.position < 1 or self.position > #self.frames then
-      self:endSequence()
+    self.position = self.position + 1
+    if self.position > #self.frames then
+      self.position = 1
     end
   end
 end
