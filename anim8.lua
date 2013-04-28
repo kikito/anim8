@@ -1,4 +1,4 @@
--- anim8 v1.2.0 - 2012-06
+-- anim8 v2.0.0 - 2013-04
 -- Copyright (c) 2011 Enrique García Cota
 -- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 -- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
@@ -30,7 +30,6 @@ local function getGridKey(...)
   return table.concat( {...} ,'-' )
 end
 
-
 local function getOrCreateFrame(self, x, y)
   if x < 1 or x > self.width or y < 1 or y > self.height then
     error(("There is no frame for x=%d, y=%d"):format(x, y))
@@ -43,61 +42,27 @@ local function getOrCreateFrame(self, x, y)
 end
 
 local function parseInterval(str)
-  str = str:gsub(' ', '')
+  if type(str) == "number" then return str,str,1 end
+  str = str:gsub('%s', '') -- remove spaces
   local min, max = str:match("^(%d+)-(%d+)$")
-  if not min then
-    min = str:match("^%d+$")
-    max = min
-  end
   assert(min and max, ("Could not parse interval from %q"):format(str))
   min, max = tonumber(min), tonumber(max)
   local step = min <= max and 1 or -1
   return min, max, step
 end
 
-local function parseIntervals(str)
-  local left, right = str:match("(.+),(.+)")
-  assert(left and right, ("Could not parse intervals from %q"):format(str))
-  local minx, maxx, stepx = parseInterval(left)
-  local miny, maxy, stepy = parseInterval(right)
-  return minx, maxx, stepx, miny, maxy, stepy
-end
+function Grid:getFrames(...)
+  local result, args = {}, {...}
+  local minx, maxx, stepx, miny, maxy, stepy
 
-local function parseFrames(self, args, result, position)
-  local current = args[position]
-  local kind = type(current)
-
-  if kind == 'number' then
-
-    result[#result + 1] = getOrCreateFrame(self, current, args[position + 1])
-    return position + 2
-
-  elseif kind == 'string' then
-
-    local minx, maxx, stepx, miny, maxy, stepy  = parseIntervals(current)
+  for i=1, #args, 2 do
+    minx, maxx, stepx = parseInterval(args[i])
+    miny, maxy, stepy = parseInterval(args[i+1])
     for y = miny, maxy, stepy do
       for x = minx, maxx, stepx do
         result[#result+1] = getOrCreateFrame(self,x,y)
       end
     end
-
-    return position + 1
-
-  else
-
-    error(("Invalid type: %q (%s)"):format(kind, tostring(args[position])))
-
-  end
-end
-
-function Grid:getFrames(...)
-  local args = {...}
-  local length = #args
-  local result = {}
-  local position = 1
-
-  while position <= length do
-    position = parseFrames(self, args, result, position)
   end
 
   return result
