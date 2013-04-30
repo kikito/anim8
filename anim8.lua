@@ -112,21 +112,21 @@ local function cloneArray(arr)
   return result
 end
 
-local function parseDelays(delays, frameCount)
+local function parseDurations(durations, frameCount)
   local result = {}
-  if type(delays) == 'number' then
-    for i=1,frameCount do result[i] = delays end
+  if type(durations) == 'number' then
+    for i=1,frameCount do result[i] = durations end
   else
     local min, max, step
-    for key,delay in pairs(delays) do
-      assert(type(delay) == 'number', "The value [" .. tostring(delay) .. "] should be a number")
+    for key,duration in pairs(durations) do
+      assert(type(duration) == 'number', "The value [" .. tostring(duration) .. "] should be a number")
       min, max, step = parseInterval(key)
-      for i = min,max,step do result[i] = delay end
+      for i = min,max,step do result[i] = duration end
     end
   end
 
   if #result < frameCount then
-    error("The delays table has length of " .. tostring(#result) .. ", but it should be >= " .. tostring(frameCount))
+    error("The durations table has length of " .. tostring(#result) .. ", but it should be >= " .. tostring(frameCount))
   end
 
   return result
@@ -134,14 +134,14 @@ end
 
 local Animationmt = { __index = Animation }
 
-local function newAnimation(frames, delays)
-  local td = type(delays);
-  if (td ~= 'number' or delays <= 0) and td ~= 'table' then
-    error("delays must be a positive number. Was " .. tostring(delays) )
+local function newAnimation(frames, durations)
+  local td = type(durations);
+  if (td ~= 'number' or durations <= 0) and td ~= 'table' then
+    error("durations must be a positive number. Was " .. tostring(durations) )
   end
   return setmetatable({
       frames      = cloneArray(frames),
-      delays      = parseDelays(delays, #frames),
+      durations      = parseDurations(durations, #frames),
       timer       = 0,
       position    = 1,
       status      = "playing",
@@ -153,7 +153,7 @@ local function newAnimation(frames, delays)
 end
 
 function Animation:clone()
-  local newAnim = newAnimation(self.frames, self.delays)
+  local newAnim = newAnimation(self.frames, self.durations)
   newAnim.flippedH, newAnim.flippedV = self.flippedH, self.flippedV
   return newAnim
 end
@@ -173,8 +173,8 @@ function Animation:update(dt)
 
   self.timer = self.timer + dt
 
-  while self.timer > self.delays[self.position] do
-    self.timer = self.timer - self.delays[self.position]
+  while self.timer > self.durations[self.position] do
+    self.timer = self.timer - self.durations[self.position]
     self.position = self.position + 1
     if self.position > #self.frames then
       self.position = 1
