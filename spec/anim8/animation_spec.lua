@@ -19,6 +19,8 @@ describe("anim8", function()
       assert.equal("playing", a.status)
       assert.same({1,2,3}, a.frames)
       assert.same({4,4,4}, a.durations)
+      assert.same({0,4,8,12}, a.intervals)
+      assert.equal(12, a.totalDuration)
     end)
     it("makes a clone of the frame table", function()
       local frames = {1,2,3}

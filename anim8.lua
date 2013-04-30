@@ -132,6 +132,15 @@ local function parseDurations(durations, frameCount)
   return result
 end
 
+local function parseIntervals(durations)
+  local result, time = {0},0
+  for i=1,#durations do
+    time = time + durations[i]
+    result[i+1] = time
+  end
+  return result, time
+end
+
 local Animationmt = { __index = Animation }
 
 local function newAnimation(frames, durations)
@@ -139,14 +148,18 @@ local function newAnimation(frames, durations)
   if (td ~= 'number' or durations <= 0) and td ~= 'table' then
     error("durations must be a positive number. Was " .. tostring(durations) )
   end
+  durations = parseDurations(durations, #frames)
+  local intervals, totalDuration = parseIntervals(durations)
   return setmetatable({
-      frames      = cloneArray(frames),
-      durations      = parseDurations(durations, #frames),
-      timer       = 0,
-      position    = 1,
-      status      = "playing",
-      flippedH    = false,
-      flippedV    = false
+    frames         = cloneArray(frames),
+    durations      = durations,
+    intervals      = intervals,
+    totalDuration  = totalDuration,
+    timer          = 0,
+    position       = 1,
+    status         = "playing",
+    flippedH       = false,
+    flippedV       = false
     },
     Animationmt
   )
