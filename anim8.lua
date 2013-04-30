@@ -112,70 +112,60 @@ local function cloneArray(arr)
   return result
 end
 
-local function parseDelays(delays)
-  local parsedDelays = {}
-  local tk,min,max,step
-  for k,v in pairs(delays) do
-    tk = type(k)
-    if     tk == "number"
-      then parsedDelays[k] = v
-    elseif tk == "string" then
-      min, max, step = parseInterval(k)
-      for i = min,max,step do parsedDelays[i] = v end
-    else
-      error(("Unexpected delay key: [%s]. Expected a number or a string"):format(tostring(k)))
-    end
-  end
-  return parsedDelays
-end
-
-local function repeatValue(value, times)
+local function parseDelays(delays, frameCount)
   local result = {}
-  for i=1,times do result[i] = value end
-  return result
-end
-
-local function createDelays(frames, defaultDelay, delays)
-  local maxFrames = #frames
-  local result = repeatValue(defaultDelay, maxFrames)
-  for i,v in pairs(parseDelays(delays)) do
-    if i > maxFrames then
-      error(("The delay value %d is too high; there are only %d frames"):format(i, maxFrames))
+  if type(delays) == 'number' then
+    for i=1,frameCount do result[i] = delays end
+  else
+    local min, max, step
+    for key,delay in pairs(delays) do
+      assert(type(delay) == 'number', "The value [" .. tostring(delay) .. "] should be a number")
+      min, max, step = parseInterval(key)
+      for i = min,max,step do result[i] = delay end
     end
-    result[i] = v
   end
+
+  if #result < frameCount then
+    error("The delays table has length of " .. tostring(#result) .. ", but it should be >= " .. tostring(frameCount))
+  end
+
   return result
 end
 
 local Animationmt = { __index = Animation }
 
-local function newAnimation(frames, defaultDelay, delays, flippedH, flippedV)
-  delays = delays or {}
-  assert(type(defaultDelay) == 'number' and defaultDelay > 0, "defaultDelay must be a positive number. Was " .. tostring(defaultDelay) )
-  assert(type(delays) == 'table', "delays must be a table or nil")
+local function newAnimation(frames, delays)
+  local td = type(delays);
+  if (td ~= 'number' or delays <= 0) and td ~= 'table' then
+    error("delays must be a positive number. Was " .. tostring(delays) )
+  end
   return setmetatable({
       frames      = cloneArray(frames),
-      delays      = createDelays(frames, defaultDelay, delays),
+      delays      = parseDelays(delays, #frames),
       timer       = 0,
       position    = 1,
       status      = "playing",
-      flippedH    = not not flippedH,
-      flippedV    = not not flippedV
+      flippedH    = false,
+      flippedV    = false
     },
     Animationmt
   )
 end
 
 function Animation:clone()
-  return newAnimation(self.frames, 1, self.delays, self.flippedH, self.flippedV)
+  local newAnim = newAnimation(self.frames, self.delays)
+  newAnim.flippedH, newAnim.flippedV = self.flippedH, self.flippedV
+  return newAnim
 end
 
 function Animation:flipH()
   self.flippedH = not self.flippedH
+  return self
 end
 
 function Animation:flipV()
   self.flippedV = not self.flippedV
+  return self
 end
 
 function Animation:update(dt)
