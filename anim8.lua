@@ -142,31 +142,34 @@ local function parseIntervals(durations)
 end
 
 local Animationmt = { __index = Animation }
+local nop = function() end
 
-local function newAnimation(frames, durations)
+local function newAnimation(frames, durations, onLoop)
   local td = type(durations);
   if (td ~= 'number' or durations <= 0) and td ~= 'table' then
     error("durations must be a positive number. Was " .. tostring(durations) )
   end
+  onLoop = onLoop or nop
   durations = parseDurations(durations, #frames)
   local intervals, totalDuration = parseIntervals(durations)
   return setmetatable({
-    frames         = cloneArray(frames),
-    durations      = durations,
-    intervals      = intervals,
-    totalDuration  = totalDuration,
-    timer          = 0,
-    position       = 1,
-    status         = "playing",
-    flippedH       = false,
-    flippedV       = false
+      frames         = cloneArray(frames),
+      durations      = durations,
+      intervals      = intervals,
+      totalDuration  = totalDuration,
+      onLoop         = onLoop,
+      timer          = 0,
+      position       = 1,
+      status         = "playing",
+      flippedH       = false,
+      flippedV       = false
     },
     Animationmt
   )
 end
 
 function Animation:clone()
-  local newAnim = newAnimation(self.frames, self.durations)
+  local newAnim = newAnimation(self.frames, self.durations, self.onLoop)
   newAnim.flippedH, newAnim.flippedV = self.flippedH, self.flippedV
   return newAnim
 end
@@ -181,30 +184,58 @@ function Animation:flipV()
   return self
 end
 
+local function seekFrameIndex(intervals, timer)
+  local high, low, i = #intervals-1, 1, 1
+
+  while(low <= high) do
+    i = math.floor((low + high) / 2)
+    if     timer >  intervals[i+1] then low  = i + 1
+    elseif timer <= intervals[i]   then high = i - 1
+    else
+      return i
+    end
+  end
+
+  return i
+end
+
 function Animation:update(dt)
   if self.status ~= "playing" then return end
 
   self.timer = self.timer + dt
-
-  while self.timer > self.durations[self.position] do
-    self.timer = self.timer - self.durations[self.position]
-    self.position = self.position + 1
-    if self.position > #self.frames then
-      self.position = 1
-    end
+  local loops = math.floor(self.timer / self.totalDuration)
+  if loops ~= 0 then
+    self.timer = self.timer - self.totalDuration * loops
+    local f = type(self.onLoop) == 'function' and self.onLoop or self[self.onLoop]
+    f(self, loops)
   end
+
+  self.position = seekFrameIndex(self.intervals, self.timer)
 end
 
 function Animation:pause()
   self.status = "paused"
 end
 
-function Animation:resume()
-  self.status = "playing"
-end
-
 function Animation:gotoFrame(position)
   self.position = position
+  self.timer = self.intervals[self.position]
+end
+
+function Animation:pauseAtEnd()
+  self.position = #self.frames
+  self.timer = self.totalDuration
+  self:pause()
+end
+
+function Animation:pauseAtStart()
+  self.position = 1
+  self.timer = 0
+  self:pause()
+end
+
+function Animation:resume()
+  self.status = "playing"
 end
 
 function Animation:draw(image, x, y, r, sx, sy, ox, oy, ...)
