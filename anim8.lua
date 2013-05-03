@@ -1,4 +1,4 @@
--- anim8 v1.2.0 - 2012-06
+-- anim8 v2.0.0 - 2013-04
 -- Copyright (c) 2011 Enrique García Cota
 -- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 -- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
@@ -30,7 +30,6 @@ local function getGridKey(...)
   return table.concat( {...} ,'-' )
 end
 
-
 local function getOrCreateFrame(self, x, y)
   if x < 1 or x > self.width or y < 1 or y > self.height then
     error(("There is no frame for x=%d, y=%d"):format(x, y))
@@ -43,61 +42,27 @@ local function getOrCreateFrame(self, x, y)
 end
 
 local function parseInterval(str)
-  str = str:gsub(' ', '')
+  if type(str) == "number" then return str,str,1 end
+  str = str:gsub('%s', '') -- remove spaces
   local min, max = str:match("^(%d+)-(%d+)$")
-  if not min then
-    min = str:match("^%d+$")
-    max = min
-  end
   assert(min and max, ("Could not parse interval from %q"):format(str))
   min, max = tonumber(min), tonumber(max)
   local step = min <= max and 1 or -1
   return min, max, step
 end
 
-local function parseIntervals(str)
-  local left, right = str:match("(.+),(.+)")
-  assert(left and right, ("Could not parse intervals from %q"):format(str))
-  local minx, maxx, stepx = parseInterval(left)
-  local miny, maxy, stepy = parseInterval(right)
-  return minx, maxx, stepx, miny, maxy, stepy
-end
+function Grid:getFrames(...)
+  local result, args = {}, {...}
+  local minx, maxx, stepx, miny, maxy, stepy
 
-local function parseFrames(self, args, result, position)
-  local current = args[position]
-  local kind = type(current)
-
-  if kind == 'number' then
-
-    result[#result + 1] = getOrCreateFrame(self, current, args[position + 1])
-    return position + 2
-
-  elseif kind == 'string' then
-
-    local minx, maxx, stepx, miny, maxy, stepy  = parseIntervals(current)
+  for i=1, #args, 2 do
+    minx, maxx, stepx = parseInterval(args[i])
+    miny, maxy, stepy = parseInterval(args[i+1])
     for y = miny, maxy, stepy do
       for x = minx, maxx, stepx do
         result[#result+1] = getOrCreateFrame(self,x,y)
       end
     end
-
-    return position + 1
-
-  else
-
-    error(("Invalid type: %q (%s)"):format(kind, tostring(args[position])))
-
-  end
-end
-
-function Grid:getFrames(...)
-  local args = {...}
-  local length = #args
-  local result = {}
-  local position = 1
-
-  while position <= length do
-    position = parseFrames(self, args, result, position)
   end
 
   return result
@@ -147,112 +112,130 @@ local function cloneArray(arr)
   return result
 end
 
-local function parseDelays(delays)
-  local parsedDelays = {}
-  local tk,min,max,step
-  for k,v in pairs(delays) do
-    tk = type(k)
-    if     tk == "number"
-      then parsedDelays[k] = v
-    elseif tk == "string" then
-      min, max, step = parseInterval(k)
-      for i = min,max,step do parsedDelays[i] = v end
-    else
-      error(("Unexpected delay key: [%s]. Expected a number or a string"):format(tostring(k)))
-    end
-  end
-  return parsedDelays
-end
-
-local function repeatValue(value, times)
+local function parseDurations(durations, frameCount)
   local result = {}
-  for i=1,times do result[i] = value end
-  return result
-end
-
-local function createDelays(frames, defaultDelay, delays)
-  local maxFrames = #frames
-  local result = repeatValue(defaultDelay, maxFrames)
-  for i,v in pairs(parseDelays(delays)) do
-    if i > maxFrames then
-      error(("The delay value %d is too high; there are only %d frames"):format(i, maxFrames))
+  if type(durations) == 'number' then
+    for i=1,frameCount do result[i] = durations end
+  else
+    local min, max, step
+    for key,duration in pairs(durations) do
+      assert(type(duration) == 'number', "The value [" .. tostring(duration) .. "] should be a number")
+      min, max, step = parseInterval(key)
+      for i = min,max,step do result[i] = duration end
     end
-    result[i] = v
   end
+
+  if #result < frameCount then
+    error("The durations table has length of " .. tostring(#result) .. ", but it should be >= " .. tostring(frameCount))
+  end
+
   return result
 end
 
-local animationModes = {
-  loop   = function(self) self.position = 1 end,
-  once   = function(self)
-    self.position = #self.frames
-    self.status = "finished"
-  end,
-  bounce = function(self)
-    self.direction = self.direction * -1
-    self.position = self.position + self.direction + self.direction
+local function parseIntervals(durations)
+  local result, time = {0},0
+  for i=1,#durations do
+    time = time + durations[i]
+    result[i+1] = time
   end
-}
+  return result, time
+end
 
 local Animationmt = { __index = Animation }
+local nop = function() end
 
-local function newAnimation(mode, frames, defaultDelay, delays, flippedH, flippedV)
-  delays = delays or {}
-  assert(animationModes[mode], ("%q is not a valid mode"):format(tostring(mode)))
-  assert(type(defaultDelay) == 'number' and defaultDelay > 0, "defaultDelay must be a positive number" )
-  assert(type(delays) == 'table', "delays must be a table or nil")
+local function newAnimation(frames, durations, onLoop)
+  local td = type(durations);
+  if (td ~= 'number' or durations <= 0) and td ~= 'table' then
+    error("durations must be a positive number. Was " .. tostring(durations) )
+  end
+  onLoop = onLoop or nop
+  durations = parseDurations(durations, #frames)
+  local intervals, totalDuration = parseIntervals(durations)
   return setmetatable({
-      mode        = mode,
-      frames      = cloneArray(frames),
-      endSequence = animationModes[mode],
-      delays      = createDelays(frames, defaultDelay, delays),
-      timer       = 0,
-      position    = 1,
-      direction   = 1,
-      status      = "playing",
-      flippedH    = not not flippedH,
-      flippedV    = not not flippedV
+      frames         = cloneArray(frames),
+      durations      = durations,
+      intervals      = intervals,
+      totalDuration  = totalDuration,
+      onLoop         = onLoop,
+      timer          = 0,
+      position       = 1,
+      status         = "playing",
+      flippedH       = false,
+      flippedV       = false
     },
     Animationmt
   )
 end
 
 function Animation:clone()
-  return newAnimation(self.mode, self.frames, 1, self.delays, self.flippedH, self.flippedV)
+  local newAnim = newAnimation(self.frames, self.durations, self.onLoop)
+  newAnim.flippedH, newAnim.flippedV = self.flippedH, self.flippedV
+  return newAnim
 end
 
 function Animation:flipH()
   self.flippedH = not self.flippedH
+  return self
 end
 
 function Animation:flipV()
   self.flippedV = not self.flippedV
+  return self
+end
+
+local function seekFrameIndex(intervals, timer)
+  local high, low, i = #intervals-1, 1, 1
+
+  while(low <= high) do
+    i = math.floor((low + high) / 2)
+    if     timer >  intervals[i+1] then low  = i + 1
+    elseif timer <= intervals[i]   then high = i - 1
+    else
+      return i
+    end
+  end
+
+  return i
 end
 
 function Animation:update(dt)
   if self.status ~= "playing" then return end
 
   self.timer = self.timer + dt
-
-  while self.timer > self.delays[self.position] do
-    self.timer = self.timer - self.delays[self.position]
-    self.position = self.position + self.direction
-    if self.position < 1 or self.position > #self.frames then
-      self:endSequence()
-    end
+  local loops = math.floor(self.timer / self.totalDuration)
+  if loops ~= 0 then
+    self.timer = self.timer - self.totalDuration * loops
+    local f = type(self.onLoop) == 'function' and self.onLoop or self[self.onLoop]
+    f(self, loops)
   end
+
+  self.position = seekFrameIndex(self.intervals, self.timer)
 end
 
 function Animation:pause()
   self.status = "paused"
 end
 
-function Animation:resume()
-  self.status = "playing"
-end
-
 function Animation:gotoFrame(position)
   self.position = position
+  self.timer = self.intervals[self.position]
+end
+
+function Animation:pauseAtEnd()
+  self.position = #self.frames
+  self.timer = self.totalDuration
+  self:pause()
+end
+
+function Animation:pauseAtStart()
+  self.position = 1
+  self.timer = 0
+  self:pause()
+end
+
+function Animation:resume()
+  self.status = "playing"
 end
 
 function Animation:draw(image, x, y, r, sx, sy, ox, oy, ...)
