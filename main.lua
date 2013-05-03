@@ -9,31 +9,29 @@ function love.load()
 
   spinning = {
                      -- type    -- frames                   --default delay
-    anim8.newAnimation('loop',   g32('1-8,1'),   0.1),
-    anim8.newAnimation('bounce', g32('18,7-11'), 0.2),
-    anim8.newAnimation('loop',   g32('1-8,2'),   0.3),
-    anim8.newAnimation('bounce', g32('19,7-11'), 0.4),
-    anim8.newAnimation('loop',   g32('1-8,3'),   0.5),
-    anim8.newAnimation('bounce', g32('20,7-11'), 0.6),
-    anim8.newAnimation('loop',   g32('1-8,4'),   0.7),
-    anim8.newAnimation('bounce', g32('21,7-11'), 0.8),
-    anim8.newAnimation('loop',   g32('1-8,5'),   0.9)
-
+    anim8.newAnimation(g32('1-8',1),              0.1),
+    anim8.newAnimation(g32(18,'8-11', 18,'10-7'), 0.2),
+    anim8.newAnimation(g32('1-8',2),              0.3),
+    anim8.newAnimation(g32(19,'8-11', 19,'10-7'), 0.4),
+    anim8.newAnimation(g32('1-8',3),              0.5),
+    anim8.newAnimation(g32(20,'8-11', 20,'10-7'), 0.6),
+    anim8.newAnimation(g32('1-8',4),              0.7),
+    anim8.newAnimation(g32(21,'8-11', 21,'10-7'), 0.8),
+    anim8.newAnimation(g32('1-8',5),              0.9)
   }
 
                          -- frame, image,    offsets, border
   local g64 = anim8.newGrid(64,64, 1024,768,  299,101,   2)
 
-  plane    = anim8.newAnimation('loop', g64('1,1-3'), 0.1)
-  seaplane = anim8.newAnimation('loop', g64('2-4,3'), 0.1)
+  plane    = anim8.newAnimation(g64(1,'1-3'), 0.1)
+  seaplane = anim8.newAnimation(g64('2-4',3), 0.1)
   seaplaneAngle = 0
 
                          -- frame, image,    offsets, border
   local gs = anim8.newGrid(32,98, 1024,768,  366,102,   1)
 
                                  -- type,  -- frames, d. delay, individual frame delays
-  submarine = anim8.newAnimation('bounce', gs('1-7,1'),   0.1,  {2,[7]=1})
-
+  submarine = anim8.newAnimation(gs('1-7',1, '6-2',1), {2,['2-6']=0.1, [7]=1, ['8-12']=0.1})
 
 end
 
