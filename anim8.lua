@@ -253,7 +253,7 @@ function Animation:draw(image, x, y, r, sx, sy, ox, oy, ...)
       oy = h - oy
     end
   end
-  love.graphics.drawq(image, frame, x, y, r, sx, sy, ox, oy, ...)
+  love.graphics.draw(image, frame, x, y, r, sx, sy, ox, oy, ...)
 end
 
 -----------------------------------------------------------
