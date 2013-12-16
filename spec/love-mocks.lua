@@ -26,7 +26,7 @@ love = {
     newQuad = function(...)
       return setmetatable({...}, Quadmt)
     end,
-    drawq = function()
+    draw = function()
     end,
     getLastDrawq = function()
     end
