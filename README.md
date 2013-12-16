@@ -15,6 +15,15 @@ Creates a *Grid*. Grids are useful for quickly defining frames (in LÖVE termino
 
 Creates a new *Animation*. Animations can be updated and drawn (they need a target image to do that). `durations` can be a number or a table. `onLoop` is an optional function or method name.
 
+LÖVE compatibility
+==================
+
+Since anim8 uses LÖVE's graphical functions, and they change from version to version, you must choose
+the version of anim8 which is compatible with your LÖVE.
+
+* The current version of anim8 is v2.1. It is compatible with LÖVE 0.9.x
+* The last version of anim8 compatible with LÖVE 0.8.x was [anim8 v2.0](https://github.com/kikito/anim8/tree/v2.0.0).
+
 Example
 =======
 
@@ -140,7 +149,7 @@ Please make sure that you read the license, too (for your convenience it's inclu
 Specs
 =====
 
-This project uses "busted":http://olivinelabs.com/busted/ for its specs. If you want to run the specs, you will have to install it first. Then just execute the following from the root folder:
+This project uses [busted](http://olivinelabs.com/busted/) for its specs. If you want to run the specs, you will have to install it first. Then just execute the following from the root folder:
 
     busted
 
