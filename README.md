@@ -47,6 +47,8 @@ function love.draw()
 end
 ```
 
+You can see a more ellaborated example in the [demo branch](https://github.com/kikito/anim8/tree/demo).
+
 Explanation
 ===========
 
