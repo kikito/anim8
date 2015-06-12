@@ -21,7 +21,7 @@ local Quadmt = {
 
 Quadmt.__index = Quadmt
 
-love = {
+_G.love = {
   graphics = {
     newQuad = function(...)
       return setmetatable({...}, Quadmt)
