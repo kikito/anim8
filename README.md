@@ -68,8 +68,8 @@ This is how you create a grid:
 * `frameWidth` and `frameHeight` are the dimensions of the animation *frames* - each of the individual "sub-images" that compose the animation. They are usually the same size as your character (so if the character is
     32x32 pixels, `frameWidth` is 32 and so is `frameHeight`)
 * `imageWidth` and `imageHeight` are the dimensions of the image where all the frames are. In LÖVE, they can be obtained by doing `image:getWidth()` and `image:getHeight()`.
-* `left` and `right` are optional, and both default to 0. They are "the left and top coordinates of the point in the image where you want to put the origin of coordinates of the grid". If all the frames in your grid are
-  the same size, and the first one's top-left corner is 0,0, you probably won't need to use `left` or `right`.
+* `left` and `top` are optional, and both default to 0. They are "the left and top coordinates of the point in the image where you want to put the origin of coordinates of the grid". If all the frames in your grid are
+  the same size, and the first one's top-left corner is 0,0, you probably won't need to use `left` or `top`.
 * `border` is also an optional value, and it also defaults to zero. What `border` does is allowing you to define "gaps" between your frames in the image. For example, imagine that you have frames of 32x32, but they
   have a 1-px border around each frame. So the first frame is not at 0,0, but at 1,1 (because of the border), the second one is at 1,33 (for the extra border) etc. You can take this into account and "skip" these borders.
 
@@ -184,4 +184,3 @@ Specs
 This project uses [busted](http://olivinelabs.com/busted/) for its specs. If you want to run the specs, you will have to install it first. Then just execute the following from the root folder:
 
     busted
-
