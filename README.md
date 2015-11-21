@@ -168,6 +168,11 @@ Moves the animation to its last frame and then pauses it.
 
 Moves the animation to its first frame and then pauses it.
 
+`animation:getDimensions()`
+
+Returns the width and height of the current frame of the animation. This method assumes the frames passed to the animation are all quads (like the ones
+created by a grid).
+
 
 Installation
 ============

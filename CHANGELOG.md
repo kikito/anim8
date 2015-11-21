@@ -1,6 +1,10 @@
 anim8 changelog
 ===============
 
+### v2.2.0
+
+* Adds Animation:getDimensions()
+
 ### v2.1.0
 
 * LÖVE version upped to 0.9.x
