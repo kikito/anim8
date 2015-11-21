@@ -213,6 +213,24 @@ describe("anim8", function()
       end)
     end)
 
+    describe(":getDimensions", function()
+      it("returns the width and height of the current frame", function()
+        local frame1 = love.graphics.newQuad(0,0,10,10)
+        local frame2 = love.graphics.newQuad(0,0,20,30)
+        local frame3 = love.graphics.newQuad(0,0,5,15)
+
+        local a = newAnimation({frame1, frame2, frame3}, 1)
+
+        assert.same({10,10}, {a:getDimensions()})
+        a:update(1.1)
+        assert.same({20,30}, {a:getDimensions()})
+        a:update(1)
+        assert.same({5,15}, {a:getDimensions()})
+        a:update(1)
+        assert.same({10,10}, {a:getDimensions()})
+      end)
+    end)
+
     describe(":flipH and :flipV", function()
       local img, frame, a
       before_each(function()

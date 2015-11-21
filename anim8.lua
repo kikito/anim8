@@ -280,6 +280,11 @@ function Animation:draw(image, x, y, r, sx, sy, ox, oy, ...)
   love.graphics.draw(image, frame, x, y, r, sx, sy, ox, oy, ...)
 end
 
+function Animation:getDimensions()
+  local _,_,w,h = self.frames[self.position]:getViewport()
+  return w,h
+end
+
 -----------------------------------------------------------
 
 anim8.newGrid       = newGrid
