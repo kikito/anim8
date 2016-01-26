@@ -14,7 +14,7 @@ LÖVE compatibility
 Since anim8 uses LÖVE's graphical functions, and they change from version to version, you must choose
 the version of anim8 which is compatible with your LÖVE.
 
-* The current version of anim8 is v2.1. It is compatible with LÖVE 0.9.x
+* The current version of anim8 is v2.1. It is compatible with LÖVE 0.9.x and 0.10.x
 * The last version of anim8 compatible with LÖVE 0.8.x was [anim8 v2.0](https://github.com/kikito/anim8/tree/v2.0.0).
 
 Example
