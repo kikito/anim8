@@ -1,4 +1,6 @@
 -- mocks for LÖVE functions
+local unpack = _G.unpack or table.unpack
+
 local Quadmt = {
   __eq = function(a,b)
     if #a ~= #b then return false end
