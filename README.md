@@ -129,9 +129,10 @@ Animations have the following methods:
 
 Use this inside `love.update(dt)` so that your animation changes frames according to the time that has passed.
 
-`animation:draw(image, x,y, angle, sx, sy, ox, oy)`
+`animation:draw(image, x,y, angle, sx, sy, ox, oy, kx, ky)`
 
-Draws the current frame in the specified coordinates with the right angle, scale and offset. These parameters work exacly the same way as in "love.graphics.drawq":https://love2d.org/wiki/love.graphics.drawq .
+Draws the current frame in the specified coordinates with the right angle, scale, offset & shearing. These parameters work exactly the same way as in [love.graphics.draw](https://love2d.org/wiki/love.graphics.draw).
+The only difference is that they are properly recalculated when the animation is flipped horizontally, vertically or both. See `getFrameInfo` below for more details.
 
 `animation:gotoFrame(frame)`
 
@@ -173,6 +174,28 @@ Moves the animation to its first frame and then pauses it.
 
 Returns the width and height of the current frame of the animation. This method assumes the frames passed to the animation are all quads (like the ones
 created by a grid).
+
+`animation:getFrameInfo(x,y, r, sx, sy, ox, oy, kx, ky)`
+
+This functions returns the parameters that would be passed to `love.graphics.draw` when drawing this animation:
+`frame, x, y, r, sx, sy, ox, oy, kx, ky`.
+
+* `frame` is the currently active frame for the animation (usually a quad produced by a grid)
+* `x,y` are the same coordinates passed as parameter to `getFrame` (there are no changes)
+* `r` is the same angle passed to `getFrame`, with no changes unless it is `nil`, in which case it becomes 0.
+* `sx,sy` are the scale values, with their sign changed if the animation is flipped vertically or horizontally
+* `ox,oy` are the offset values, with the width or height properly substracted if the animation is flipped. 0 is used as a initial value for these calculations if nil was passed.
+* `kx,ky` are the shearing factors, changed depending on the flip status.
+
+The `getFrame` method can be used when working with [spriteBatches](https://love2d.org/wiki/SpriteBatch). Here's how it can be used for adding & setting the corresponding quad in a spritebatch:
+
+``` lua
+local id = spriteBatch:add(animation:getFrameInfo(x,y,r,sx,sy,ox,oy,kx,ky))
+
+...
+
+spriteBatch:set(id, animation:getFrameInfo(x,y,r,sx,sy,ox,oy,kx,ky))
+```
 
 
 Installation
