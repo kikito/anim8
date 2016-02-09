@@ -43,7 +43,7 @@ describe("anim8", function()
 
   describe("Grid", function()
     describe("getFrames", function()
-      local g, f
+      local g, nq
       before_each(function()
         g = newGrid(16,16,64,64)
         nq = function(x,y) return newQuad(x,y, 16,16, 64,64) end
