@@ -262,22 +262,27 @@ function Animation:resume()
   self.status = "playing"
 end
 
-function Animation:draw(image, x, y, r, sx, sy, ox, oy, ...)
+function Animation:draw(image, x, y, r, sx, sy, ox, oy, kx, ky)
   local frame = self.frames[self.position]
   if self.flippedH or self.flippedV then
-    r,sx,sy,ox,oy = r or 0, sx or 1, sy or 1, ox or 0, oy or 0
+    r,sx,sy,ox,oy,kx,ky = r or 0, sx or 1, sy or 1, ox or 0, oy or 0, kx or 0, ky or 0
     local _,_,w,h = frame:getViewport()
 
     if self.flippedH then
       sx = sx * -1
       ox = w - ox
+      kx = kx * -1
+      ky = ky * -1
     end
+
     if self.flippedV then
       sy = sy * -1
       oy = h - oy
+      kx = kx * -1
+      ky = ky * -1
     end
   end
-  love.graphics.draw(image, frame, x, y, r, sx, sy, ox, oy, ...)
+  love.graphics.draw(image, frame, x, y, r, sx, sy, ox, oy, kx, ky)
 end
 
 function Animation:getDimensions()
