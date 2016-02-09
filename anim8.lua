@@ -263,10 +263,10 @@ function Animation:resume()
 end
 
 function Animation:draw(image, x, y, r, sx, sy, ox, oy, kx, ky)
-  love.graphics.draw(image, self:getFrame(x, y, r, sx, sy, ox, oy, kx, ky))
+  love.graphics.draw(image, self:getFrameInfo(x, y, r, sx, sy, ox, oy, kx, ky))
 end
 
-function Animation:getFrame(x, y, r, sx, sy, ox, oy, kx, ky)
+function Animation:getFrameInfo(x, y, r, sx, sy, ox, oy, kx, ky)
   local frame = self.frames[self.position]
   if self.flippedH or self.flippedV then
     r,sx,sy,ox,oy,kx,ky = r or 0, sx or 1, sy or 1, ox or 0, oy or 0, kx or 0, ky or 0
