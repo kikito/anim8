@@ -4,6 +4,7 @@ anim8
 Animation library for [LÖVE](http://love2d.org).
 
 [![Build Status](https://travis-ci.org/kikito/anim8.png?branch=master)](https://travis-ci.org/kikito/anim8)
+[![Coverage Status](https://coveralls.io/repos/github/kikito/anim8/badge.svg?branch=master)](https://coveralls.io/github/kikito/anim8?branch=master)
 
 In order to build animations more easily, anim8 divides the process in two steps: first you create a *grid*, which
 is capable of creating *frames* (Quads) easily and quickly. Then you use the grid to create one or more *animations*.
