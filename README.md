@@ -197,6 +197,8 @@ local id = spriteBatch:add(animation:getFrameInfo(x,y,r,sx,sy,ox,oy,kx,ky))
 spriteBatch:set(id, animation:getFrameInfo(x,y,r,sx,sy,ox,oy,kx,ky))
 ```
 
+You can see an example of this in the [spritebatch-demo branch](https://github.com/kikito/anim8/tree/spritebatch-demo).
+
 
 Installation
 ============
