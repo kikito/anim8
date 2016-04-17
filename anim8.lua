@@ -294,6 +294,14 @@ function Animation:getDimensions()
   return w,h
 end
 
+function Animation:getDuration()
+  local totalduration = 0
+  for _,duration in ipairs(self.durations) do
+    totalduration = totalduration + duration
+  end
+  return totalduration
+end
+
 -----------------------------------------------------------
 
 anim8.newGrid       = newGrid
