@@ -295,11 +295,7 @@ function Animation:getDimensions()
 end
 
 function Animation:getDuration()
-  local totalduration = 0
-  for _,duration in ipairs(self.durations) do
-    totalduration = totalduration + duration
-  end
-  return totalduration
+  return self.totalDuration
 end
 
 -----------------------------------------------------------
