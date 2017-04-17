@@ -182,6 +182,7 @@ local function newAnimation(frames, durations, onLoop)
       intervals      = intervals,
       totalDuration  = totalDuration,
       onLoop         = onLoop,
+      onFrameStart   = {},
       timer          = 0,
       position       = 1,
       status         = "playing",
@@ -223,6 +224,10 @@ local function seekFrameIndex(intervals, timer)
   return i
 end
 
+function Animation:setFrameStart(keyframe, delegate)
+  self.onFrameStart[keyframe] = delegate
+end
+
 function Animation:update(dt)
   if self.status ~= "playing" then return end
 
@@ -234,7 +239,11 @@ function Animation:update(dt)
     f(self, loops)
   end
 
+  local prevpos = self.position
   self.position = seekFrameIndex(self.intervals, self.timer)
+  if self.position ~= prevpos and self.onFrameStart[self.position] then
+    self.onFrameStart[self.position](self)
+  end
 end
 
 function Animation:pause()
