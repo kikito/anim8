@@ -163,6 +163,14 @@ This method returns the animation, so you can do things like `local a = anim8.ne
 
 Flips an animation vertically. The same rules that apply to `flipH` also apply here.
 
+`animation:isFlippedH()`
+
+Checks whether the animation is flipped horizontally.
+
+`animation:isFlippedV()`
+
+Checks whether the animation is flipped vertically.
+
 `animation:pauseAtEnd()`
 
 Moves the animation to its last frame and then pauses it.

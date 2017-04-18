@@ -208,6 +208,14 @@ function Animation:flipV()
   return self
 end
 
+function Animation:isFlippedH()
+    return self.flippedH
+end
+
+function Animation:isFlippedV()
+    return self.flippedV
+end
+
 local function seekFrameIndex(intervals, timer)
   local high, low, i = #intervals-1, 1, 1
 
