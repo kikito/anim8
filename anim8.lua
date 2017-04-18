@@ -294,6 +294,10 @@ function Animation:getDimensions()
   return w,h
 end
 
+function Animation:getDuration()
+  return self.totalDuration
+end
+
 -----------------------------------------------------------
 
 anim8.newGrid       = newGrid
