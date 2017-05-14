@@ -157,7 +157,7 @@ Flips an animation horizontally (left goes to right and viceversa). This means t
 
 Note that this method does not create a new animation. If you want to create a new one, use the `clone` method.
 
-This method returns the animation, so you can do things like `local a = anim8.newAnimation(g(1,'1-10'), 0.1):flipV()`
+This method returns the animation, so you can do things like `local a = anim8.newAnimation(g(1,'1-10'), 0.1):flipH()`
 
 `animation:flipV()`
 
