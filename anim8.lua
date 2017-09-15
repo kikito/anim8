@@ -213,8 +213,8 @@ local function seekFrameIndex(intervals, timer)
 
   while(low <= high) do
     i = math.floor((low + high) / 2)
-    if     timer >  intervals[i+1] then low  = i + 1
-    elseif timer <= intervals[i]   then high = i - 1
+    if     timer >= intervals[i+1] then low  = i + 1
+    elseif timer <  intervals[i]   then high = i - 1
     else
       return i
     end
