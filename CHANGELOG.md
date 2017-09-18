@@ -1,6 +1,10 @@
 anim8 changelog
 ===============
 
+### v2.3.1
+
+* Fixes bug where gotoFrame sometimes ended up on the wrong frame, which produced flickering (#19, #28)
+
 ### v2.3.0
 
 * Adds support for shearing (kx, ky parameters when drawing)
