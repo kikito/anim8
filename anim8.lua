@@ -245,6 +245,17 @@ function Animation:gotoFrame(position)
   self.position = position
   self.timer = self.intervals[self.position]
 end
+--Pause animation in desired position
+function Animation:pauseAtFrame(position)
+  if self.position == position then
+    self.status = "paused"
+  end
+
+end
+--Return only frame's position
+function Animation:getFramePosition()
+  return self.position
+end
 
 function Animation:pauseAtEnd()
   self.position = #self.frames
