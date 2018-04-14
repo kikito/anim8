@@ -1,5 +1,5 @@
 package = "anim8"
-version = "scm-1"
+version = "2.3.1-0"
 source = {
    url = "https://github.com/kikito/anim8/archive/v2.3.1.tar.gz"
 }
