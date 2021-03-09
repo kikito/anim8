@@ -35,7 +35,7 @@ local _frames = {}
 local function assertPositiveInteger(value, name)
   if type(value) ~= 'number' then error(("%s should be a number, was %q"):format(name, tostring(value))) end
   if value < 1 then error(("%s should be a positive number, was %d"):format(name, value)) end
-  if value ~= math.floor(value) then error(("%s should be an integer, was %d"):format(name, value)) end
+  if value ~= math.floor(value) then error(("%s should be an integer, was %f"):format(name, value)) end
 end
 
 local function createFrame(self, x, y)
