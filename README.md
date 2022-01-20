@@ -90,11 +90,15 @@ Grids only have one important method: `Grid:getFrames(...)`.
 
 But you will probably never use getFrames directly. You can use a grid as if it was a function, and getFrames will be called. In other words, given a grid called `g`, this:
 
-    g:getFrames('2-8',1, 1,2)
+```lua
+g:getFrames('2-8',1, 1,2)
+```
 
 Is equivalent to this:
 
-    g('2-8',1, 1,2)
+```lua
+g('2-8',1, 1,2)
+```
 
 This is very convenient to use in animations.
 
@@ -109,17 +113,18 @@ If you make its grid start on its first frame (using `left` and `top`), you can 
 ```
 However that way you will get a submarine which "emerges", then "suddenly disappears", and emerges again. To make it look more natural, you must add some animation frames "backwards", to give the illusion
 of "submersion". Here's the complete list:
-
-    local frames = gs('1-7',1, '6-2',1)
-
-
+```lua
+local frames = gs('1-7',1, '6-2',1)
+```
 
 Animations
 ----------
 
 Animations are groups of frames that are interchanged every now and then.
 
-`local animation = anim8.newAnimation(frames, durations, onLoop)`:
+```lua
+local animation = anim8.newAnimation(frames, durations, onLoop)
+```
 
 * `frames` is an array of frames (Quads in LÖVE argot). You could provide your own quad array if you wanted to, but using a grid to get them is very convenient.
 * `durations` is a number or a table. When it's a number, it represents the duration of all frames in the animation. When it's a table, it can represent different durations for different frames. You can specify durations for all frames individually, like this: `{0.1, 0.5, 0.1}` or you can specify durations for ranges of frames: `{['3-5']=0.2}`.
@@ -128,32 +133,46 @@ string 'pauseAtEnd'. It will make the animation loop once and then pause and sto
 
 Animations have the following methods:
 
-`animation:update(dt)`
+```lua
+animation:update(dt)
+```
 
 Use this inside `love.update(dt)` so that your animation changes frames according to the time that has passed.
 
-`animation:draw(image, x,y, angle, sx, sy, ox, oy, kx, ky)`
+```lua
+animation:draw(image, x,y, angle, sx, sy, ox, oy, kx, ky)
+```
 
 Draws the current frame in the specified coordinates with the right angle, scale, offset & shearing. These parameters work exactly the same way as in [love.graphics.draw](https://love2d.org/wiki/love.graphics.draw).
 The only difference is that they are properly recalculated when the animation is flipped horizontally, vertically or both. See `getFrameInfo` below for more details.
 
-`animation:gotoFrame(frame)`
+```lua
+animation:gotoFrame(frame)
+```
 
 Moves the animation to a given frame (frames start counting in 1).
 
-`animation:pause()`
+```lua
+animation:pause()
+```
 
 Stops the animation from updating (@animation:update(dt)@ will have no effect)
 
-`animation:resume()`
+```lua
+animation:resume()
+```
 
 Unpauses an animation
 
-`animation:clone()`
+```lua
+animation:clone()
+```
 
 Creates a new animation identical to the current one. The only difference is that its internal counter is reset to 0 (it's on the first frame).
 
-`animation:flipH()`
+```lua
+animation:flipH()
+```
 
 Flips an animation horizontally (left goes to right and viceversa). This means that the frames are simply drawn differently, nothing more.
 
@@ -161,27 +180,39 @@ Note that this method does not create a new animation. If you want to create a n
 
 This method returns the animation, so you can do things like `local a = anim8.newAnimation(g(1,'1-10'), 0.1):flipH()` or `local b = a:clone():flipV()`.
 
-`animation:flipV()`
+```lua
+animation:flipV()
+```
 
 Flips an animation vertically. The same rules that apply to `flipH` also apply here.
 
-`animation:pauseAtEnd()`
+```lua
+animation:pauseAtEnd()
+```
 
 Moves the animation to its last frame and then pauses it.
 
-`animation:pauseAtStart()`
+```lua
+animation:pauseAtStart()
+```
 
 Moves the animation to its first frame and then pauses it.
 
-`animation:getDimensions()`
+```lua
+animation:getDimensions()
+```
 
 Returns the width and height of the current frame of the animation. This method assumes the frames passed to the animation are all quads (like the ones
 created by a grid).
 
-`animation:getFrameInfo(x,y, r, sx, sy, ox, oy, kx, ky)`
+```lua
+animation:getFrameInfo(x,y, r, sx, sy, ox, oy, kx, ky)
+```
 
 This functions returns the parameters that would be passed to `love.graphics.draw` when drawing this animation:
-`frame, x, y, r, sx, sy, ox, oy, kx, ky`.
+```lua
+frame, x, y, r, sx, sy, ox, oy, kx, ky
+```
 
 * `frame` is the currently active frame for the animation (usually a quad produced by a grid)
 * `x,y` are the same coordinates passed as parameter to `getFrame` (there are no changes)
@@ -192,7 +223,7 @@ This functions returns the parameters that would be passed to `love.graphics.dra
 
 The `getFrame` method can be used when working with [spriteBatches](https://love2d.org/wiki/SpriteBatch). Here's how it can be used for adding & setting the corresponding quad in a spritebatch:
 
-``` lua
+```lua
 local id = spriteBatch:add(animation:getFrameInfo(x,y,r,sx,sy,ox,oy,kx,ky))
 
 ...
@@ -208,7 +239,9 @@ Installation
 
 Just copy the anim8.lua file wherever you want it. Then require it wherever you need it:
 
-    local anim8 = require 'anim8'
+```lua
+local anim8 = require 'anim8'
+```
 
 Please make sure that you read the license, too (for your convenience it's included at the beginning of the anim8.lua file).
 
@@ -217,4 +250,6 @@ Specs
 
 This project uses [busted](http://olivinelabs.com/busted/) for its specs. If you want to run the specs, you will have to install it first. Then just execute the following from the root folder:
 
-    busted
+```sh
+busted
+```
