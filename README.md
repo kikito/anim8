@@ -21,7 +21,7 @@ the version of anim8 which is compatible with your LÖVE.
 Example
 =======
 
-```
+```lua
 local anim8 = require 'anim8'
 
 local image, animation
@@ -64,7 +64,9 @@ Grids are just a convenient way of getting frames from a sprite. Frames are assu
 
 This is how you create a grid:
 
-`anim8.newGrid(frameWidth, frameHeight, imageWidth, imageHeight, left, top, border)`:
+```lua
+anim8.newGrid(frameWidth, frameHeight, imageWidth, imageHeight, left, top, border):
+```
 
 * `frameWidth` and `frameHeight` are the dimensions of the animation *frames* - each of the individual "sub-images" that compose the animation. They are usually the same size as your character (so if the character is
     32x32 pixels, `frameWidth` is 32 and so is `frameHeight`)
@@ -99,12 +101,12 @@ This is very convenient to use in animations.
 Let's consider the submarine in the previous example. It has 7 frames, arranged horizontally.
 
 If you make its grid start on its first frame (using `left` and `top`), you can get its frames like this:
-
+```lua
                            -- frame, image,    offsets, border
     local gs = anim8.newGrid(32,98, 1024,768,  366,102,   1)
 
     local frames = gs('1-7',1)
-
+```
 However that way you will get a submarine which "emerges", then "suddenly disappears", and emerges again. To make it look more natural, you must add some animation frames "backwards", to give the illusion
 of "submersion". Here's the complete list:
 
