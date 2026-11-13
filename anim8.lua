@@ -144,6 +144,7 @@ local function parseDurations(durations, frameCount)
     local min, max, step
     for key,duration in pairs(durations) do
       assert(type(duration) == 'number', "The value [" .. tostring(duration) .. "] should be a number")
+      assert(duration > 0, "The value [" .. tostring(duration) .. "] should be greater than zero")
       min, max, step = parseInterval(key)
       for i = min,max,step do result[i] = duration end
     end
